@@ -1,0 +1,7 @@
+.idea
+config
+*.exe
+*.log
+logs
+main.go
+app
