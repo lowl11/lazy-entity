@@ -1,10 +1,10 @@
 package delete_builder
 
 import (
-	"github.com/lowl11/lazy-entity/entity_domain"
 	"github.com/lowl11/lazy-entity/field_type"
-	"github.com/lowl11/lazy-entity/signs"
-	"github.com/lowl11/lazy-entity/template_service"
+	"github.com/lowl11/lazy-entity/internal/entity_domain"
+	"github.com/lowl11/lazy-entity/internal/signs"
+	"github.com/lowl11/lazy-entity/internal/template_service"
 	"strings"
 )
 
@@ -12,8 +12,7 @@ func (builder *Builder) Build() string {
 	templateList := make([]string, 0, 1)
 
 	// main template
-	main := template_service.
-		New(mainTemplate).
+	main := template_service.New(mainTemplate).
 		Var("TABLE_NAME", builder.tableName).
 		Get()
 

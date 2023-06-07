@@ -1,6 +1,8 @@
 package delete_builder
 
-import "github.com/lowl11/lazy-entity/entity_domain"
+import (
+	"github.com/lowl11/lazy-entity/internal/entity_domain"
+)
 
 type Builder struct {
 	tableName     string
