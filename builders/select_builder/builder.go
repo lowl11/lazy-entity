@@ -5,9 +5,8 @@ type Builder struct {
 	aliasName string
 }
 
-func New(tableName, aliasName string) *Builder {
+func New(tableName string) *Builder {
 	return &Builder{
 		tableName: tableName,
-		aliasName: aliasName,
 	}
 }
