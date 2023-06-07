@@ -18,7 +18,7 @@ func (builder *Builder) Build() string {
 	for _, item := range builder.updateList {
 		setList = append(setList, template_service.New(setTemplate).
 			Var("SET_FIELD", item.Field).
-			Var("SET_VALUE", getValue(item.ValueType, item.Value)).
+			Var("SET_VALUE", getValue(item.ValueType, item.Value, item.Field)).
 			Get())
 	}
 
