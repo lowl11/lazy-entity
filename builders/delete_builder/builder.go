@@ -1,8 +1,6 @@
 package delete_builder
 
 type Builder struct {
-	query string
-
 	tableName string
 }
 
