@@ -7,6 +7,7 @@ type Service struct {
 	conditionList []entity_domain.ConditionPair
 
 	aliasName string
+	noWhere   bool
 }
 
 func New(predicate string, conditionList []entity_domain.ConditionPair) *Service {

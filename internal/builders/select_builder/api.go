@@ -2,10 +2,11 @@ package select_builder
 
 import (
 	"github.com/lowl11/lazy-entity/field_type"
-	"github.com/lowl11/lazy-entity/internal/condition_service"
 	"github.com/lowl11/lazy-entity/internal/entity_domain"
+	"github.com/lowl11/lazy-entity/internal/services/condition_service"
+	"github.com/lowl11/lazy-entity/internal/services/join_service"
+	"github.com/lowl11/lazy-entity/internal/services/template_service"
 	"github.com/lowl11/lazy-entity/internal/signs"
-	"github.com/lowl11/lazy-entity/internal/template_service"
 	"github.com/lowl11/lazy-entity/predicates"
 	"strings"
 )
@@ -35,8 +36,7 @@ func (builder *Builder) Build() string {
 	}
 
 	// main template
-	mainService := template_service.
-		New(mainTemplate).
+	mainService := template_service.New(mainTemplate).
 		Var("TABLE_NAME", builder.tableName).
 		Var("FIELD_LIST", fieldListValue)
 
@@ -49,10 +49,14 @@ func (builder *Builder) Build() string {
 
 	templateList = append(templateList, mainService.Get())
 
+	joinTemplate := join_service.New(builder.aliasName, builder.joinList).Get()
+	if joinTemplate != "" {
+		templateList = append(templateList, joinTemplate)
+	}
+
 	// condition template
 	if len(builder.conditionList) > 0 {
-		templateList = append(templateList, condition_service.
-			New(predicates.And, builder.conditionList).
+		templateList = append(templateList, condition_service.New(predicates.And, builder.conditionList).
 			Alias(builder.aliasName).
 			Get())
 	}
@@ -97,5 +101,10 @@ func (builder *Builder) ConditionIlike(field, value string) *Builder {
 		Sign:      signs.Ilike,
 		ValueType: field_type.Text,
 	})
+	return builder
+}
+
+func (builder *Builder) Join(joins ...entity_domain.JoinPair) *Builder {
+	builder.joinList = append(builder.joinList, joins...)
 	return builder
 }

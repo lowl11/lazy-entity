@@ -2,7 +2,7 @@ package insert_builder
 
 import (
 	"github.com/lowl11/lazy-entity/internal/entity_domain"
-	"github.com/lowl11/lazy-entity/internal/template_service"
+	"github.com/lowl11/lazy-entity/internal/services/template_service"
 	"strings"
 )
 
@@ -22,15 +22,13 @@ func (builder *Builder) Build() string {
 	}
 
 	// main template
-	main := template_service.
-		New(mainTemplate).
+	main := template_service.New(mainTemplate).
 		Var("TABLE_NAME", builder.tableName).
 		Var("FIELD_LIST", strings.Join(fieldList, ", ")).
 		Get()
 
 	// values template
-	value := template_service.
-		New(valueTemplate).
+	value := template_service.New(valueTemplate).
 		Var("VALUE_LIST", strings.Join(valueList, ", ")).
 		Get()
 

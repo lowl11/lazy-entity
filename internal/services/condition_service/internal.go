@@ -15,6 +15,8 @@ func getValue(valueType, value, field string) string {
 		return value
 	case field_type.Variable:
 		return ":" + field
+	case field_type.Join:
+		return value
 	}
 	return "'" + value + "'"
 }

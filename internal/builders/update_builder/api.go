@@ -3,8 +3,8 @@ package update_builder
 import (
 	"github.com/lowl11/lazy-entity/field_type"
 	"github.com/lowl11/lazy-entity/internal/entity_domain"
+	"github.com/lowl11/lazy-entity/internal/services/template_service"
 	"github.com/lowl11/lazy-entity/internal/signs"
-	"github.com/lowl11/lazy-entity/internal/template_service"
 	"strings"
 )
 

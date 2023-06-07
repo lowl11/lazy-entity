@@ -8,6 +8,7 @@ type Builder struct {
 
 	fieldList     []string
 	conditionList []entity_domain.ConditionPair
+	joinList      []entity_domain.JoinPair
 }
 
 func New(tableName string) *Builder {
@@ -15,5 +16,6 @@ func New(tableName string) *Builder {
 		tableName:     tableName,
 		fieldList:     make([]string, 0),
 		conditionList: make([]entity_domain.ConditionPair, 0),
+		joinList:      make([]entity_domain.JoinPair, 0),
 	}
 }

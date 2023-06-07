@@ -5,4 +5,5 @@ const (
 	Numeric  = "numeric"
 	Boolean  = "bool"
 	Variable = "variable"
+	Join     = "join"
 )
