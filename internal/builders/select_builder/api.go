@@ -24,7 +24,7 @@ func (builder *Builder) Build() string {
 			fieldText = item + ", "
 		}
 
-		if len(builder.aliasName) > 0 {
+		if len(builder.aliasName) > 0 && !strings.Contains(fieldText, ".") {
 			fieldText = builder.aliasName + "." + fieldText
 		}
 		fieldListValue += fieldText
