@@ -2,43 +2,27 @@ package query_service
 
 import (
 	"github.com/lowl11/lazy-entity/builders/delete_builder"
-	"github.com/lowl11/lazy-entity/entity_domain"
-	"github.com/lowl11/lazy-entity/field_type"
-	"github.com/lowl11/lazy-entity/signs"
+	"github.com/lowl11/lazy-entity/builders/insert_builder"
+	"github.com/lowl11/lazy-entity/builders/select_builder"
+	"github.com/lowl11/lazy-entity/builders/update_builder"
 )
 
-func (service *Service) Delete() string {
+func (service *Service) Select() *select_builder.Builder {
+	return select_builder.
+		New(service.tableName, service.aliasName)
+}
+
+func (service *Service) Insert() *insert_builder.Builder {
+	return insert_builder.
+		New(service.tableName)
+}
+
+func (service *Service) Update() *update_builder.Builder {
+	return update_builder.
+		New(service.tableName)
+}
+
+func (service *Service) Delete() *delete_builder.Builder {
 	return delete_builder.
-		New(service.tableName).
-		Build(service.conditionList)
-}
-
-func (service *Service) ConditionEquals(field, value, valueType string) *Service {
-	service.conditionList = append(service.conditionList, entity_domain.ConditionPair{
-		Field:     field,
-		Value:     value,
-		Sign:      signs.Equals,
-		ValueType: valueType,
-	})
-	return service
-}
-
-func (service *Service) ConditionLike(field, value string) *Service {
-	service.conditionList = append(service.conditionList, entity_domain.ConditionPair{
-		Field:     field,
-		Value:     value,
-		Sign:      signs.Like,
-		ValueType: field_type.Text,
-	})
-	return service
-}
-
-func (service *Service) ConditionIlike(field, value string) *Service {
-	service.conditionList = append(service.conditionList, entity_domain.ConditionPair{
-		Field:     field,
-		Value:     value,
-		Sign:      signs.Ilike,
-		ValueType: field_type.Text,
-	})
-	return service
+		New(service.tableName)
 }
