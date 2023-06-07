@@ -1,10 +1,10 @@
-package select_builder
+package condition_service
 
 import "github.com/lowl11/lazy-entity/field_type"
 
 const (
-	mainTemplate      = "SELECT {{FIELD_LIST}} FROM {{TABLE_NAME}}{{ALIAS_NAME}}"
-	conditionTemplate = "WHERE {{CONDITION_NAME}} {{CONDITION_SIGN}} {{CONDITION_VALUE}}"
+	template     = "WHERE {{CONDITION_LIST}}"
+	itemTemplate = "{{CONDITION_NAME}} {{CONDITION_SIGN}} {{CONDITION_VALUE}}"
 )
 
 func getValue(valueType, value, field string) string {
