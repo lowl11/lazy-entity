@@ -6,6 +6,10 @@ import (
 )
 
 func (service *Service) Get() string {
+	if len(service.conditionList) == 0 {
+		return ""
+	}
+
 	itemList := make([]string, 0, len(service.conditionList))
 	for _, item := range service.conditionList {
 		fieldText := item.Field

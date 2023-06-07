@@ -3,8 +3,10 @@ package update_builder
 import (
 	"github.com/lowl11/lazy-entity/field_type"
 	"github.com/lowl11/lazy-entity/internal/entity_domain"
+	"github.com/lowl11/lazy-entity/internal/services/condition_service"
 	"github.com/lowl11/lazy-entity/internal/services/template_service"
 	"github.com/lowl11/lazy-entity/internal/signs"
+	"github.com/lowl11/lazy-entity/predicates"
 	"strings"
 )
 
@@ -30,15 +32,7 @@ func (builder *Builder) Build() string {
 
 	// condition template
 	if len(builder.conditionList) > 0 {
-		conditionService := template_service.New(conditionTemplate)
-
-		for _, item := range builder.conditionList {
-			conditionService.Var("CONDITION_NAME", item.Field)
-			conditionService.Var("CONDITION_SIGN", item.Sign)
-			conditionService.Var("CONDITION_VALUE", getValue(item.ValueType, item.Value))
-		}
-
-		templateList = append(templateList, conditionService.Get())
+		templateList = append(templateList, condition_service.New(predicates.And, builder.conditionList).Get())
 	}
 
 	return strings.Join(templateList, "\n")

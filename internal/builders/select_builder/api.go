@@ -49,6 +49,7 @@ func (builder *Builder) Build() string {
 
 	templateList = append(templateList, mainService.Get())
 
+	// join template
 	joinTemplate := join_service.New(builder.aliasName, builder.joinList).Get()
 	if joinTemplate != "" {
 		templateList = append(templateList, joinTemplate)
