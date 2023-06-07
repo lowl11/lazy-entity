@@ -14,7 +14,7 @@ func (service *Service) Get() string {
 
 	queries := make([]string, 0, len(service.joinList))
 	for _, item := range service.joinList {
-		queries = append(queries, getType(item.Type)+" "+template_service.
+		queries = append(queries, "\t"+getType(item.Type)+" "+template_service.
 			New(template).
 			Var("TABLE_NAME", item.TableName).
 			Var("ALIAS_NAME", getAlias(item.AliasName)).
