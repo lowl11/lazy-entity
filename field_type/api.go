@@ -1,7 +1,8 @@
 package field_type
 
 const (
-	Text    = "text"
-	Numeric = "numeric"
-	Boolean = "bool"
+	Text     = "text"
+	Numeric  = "numeric"
+	Boolean  = "bool"
+	Variable = "variable"
 )
