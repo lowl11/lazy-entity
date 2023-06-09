@@ -2,20 +2,34 @@ package select_builder
 
 import (
 	"github.com/lowl11/lazy-entity/internal/helpers/type_helper"
+	"github.com/lowl11/lazy-entity/internal/join_types"
 	"strings"
 )
 
 func (builder *Builder) Build() string {
+	queries := make([]string, 0, 3)
+
 	// main template
 	main := "SELECT " + builder.getFields() + " FROM " + builder.getTableName()
+	queries = append(queries, main)
 
-	// where template
-	var where string
-	if len(builder.conditions) > 0 {
-		where += "WHERE \n" + builder.conditions
+	// join template
+	if len(builder.joinList) > 0 {
+		joinQueries := make([]string, 0, len(builder.joinList))
+		for _, item := range builder.joinList {
+			joinQueries = append(joinQueries, "\t"+item.joinType+" JOIN "+item.TableName+" AS "+item.AliasName+" ON "+item.Conditions)
+		}
+		queries = append(queries, strings.Join(joinQueries, "\n"))
 	}
 
-	return strings.Join([]string{main, where}, "\n")
+	// where template
+	if len(builder.conditions) > 0 {
+		var where string
+		where += "WHERE \n" + builder.conditions
+		queries = append(queries, where)
+	}
+
+	return strings.Join(queries, "\n")
 }
 
 func (builder *Builder) Fields(fieldList ...string) *Builder {
@@ -33,10 +47,32 @@ func (builder *Builder) Alias(aliasName string) *Builder {
 	return builder
 }
 
-func (builder *Builder) Join(tableName, aliasName string) *Builder {
+func (builder *Builder) Join(tableName, aliasName, conditions string) *Builder {
 	builder.joinList = append(builder.joinList, joinModel{
-		TableName: tableName,
-		AliasName: aliasName,
+		TableName:  tableName,
+		AliasName:  aliasName,
+		Conditions: conditions,
+		joinType:   join_types.Inner,
+	})
+	return builder
+}
+
+func (builder *Builder) LeftJoin(tableName, aliasName, conditions string) *Builder {
+	builder.joinList = append(builder.joinList, joinModel{
+		TableName:  tableName,
+		AliasName:  aliasName,
+		Conditions: conditions,
+		joinType:   join_types.Left,
+	})
+	return builder
+}
+
+func (builder *Builder) RightJoin(tableName, aliasName, conditions string) *Builder {
+	builder.joinList = append(builder.joinList, joinModel{
+		TableName:  tableName,
+		AliasName:  aliasName,
+		Conditions: conditions,
+		joinType:   join_types.Right,
 	})
 	return builder
 }

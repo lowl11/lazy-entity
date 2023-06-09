@@ -14,6 +14,7 @@ func (builder *Builder) getFields() string {
 		aliasedFields := make([]string, 0, len(builder.fieldList))
 		array.NewWithList[string](builder.fieldList...).Each(func(item string) {
 			if strings.Contains(item, ".") {
+				aliasedFields = append(aliasedFields, item)
 				return
 			}
 
