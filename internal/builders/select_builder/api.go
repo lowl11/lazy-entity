@@ -29,6 +29,18 @@ func (builder *Builder) Build() string {
 		queries = append(queries, where)
 	}
 
+	// offset template
+	offset := builder.getOffset()
+	if offset != "" {
+		queries = append(queries, offset)
+	}
+
+	// limit template
+	limit := builder.getLimit()
+	if limit != "" {
+		queries = append(queries, limit)
+	}
+
 	return strings.Join(queries, "\n")
 }
 
@@ -112,4 +124,14 @@ func (builder *Builder) Like(field string, value any) string {
 
 func (builder *Builder) ILike(field string, value any) string {
 	return builder.getFieldItem(field) + " ILIKE " + type_helper.ToString(value)
+}
+
+func (builder *Builder) Offset(value int) *Builder {
+	builder.offset = value
+	return builder
+}
+
+func (builder *Builder) Limit(value int) *Builder {
+	builder.limit = value
+	return builder
 }

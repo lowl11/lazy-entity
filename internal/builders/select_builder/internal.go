@@ -2,6 +2,7 @@ package select_builder
 
 import (
 	"github.com/lowl11/lazy-collection/array"
+	"github.com/lowl11/lazy-entity/internal/helpers/type_helper"
 	"strings"
 )
 
@@ -41,4 +42,20 @@ func (builder *Builder) getTableName() string {
 		alias = " AS " + builder.aliasName
 	}
 	return builder.tableName + alias
+}
+
+func (builder *Builder) getOffset() string {
+	if builder.offset < 0 {
+		return ""
+	}
+
+	return "OFFSET " + type_helper.ToString(builder.offset)
+}
+
+func (builder *Builder) getLimit() string {
+	if builder.limit < 0 {
+		return ""
+	}
+
+	return "LIMIT " + type_helper.ToString(builder.limit)
 }
