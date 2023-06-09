@@ -16,7 +16,12 @@ func ToString(anyValue any) string {
 
 	switch value.Kind() {
 	case reflect.String:
-		return "'" + anyValue.(string) + "'"
+		stringValue := anyValue.(string)
+		if len(stringValue) > 0 && stringValue[0] == '$' {
+			return stringValue[1:]
+		}
+
+		return "'" + stringValue + "'"
 	case reflect.Bool:
 		return strconv.FormatBool(anyValue.(bool))
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
