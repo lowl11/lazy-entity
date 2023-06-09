@@ -30,9 +30,10 @@ func (builder *Builder) getFields() string {
 
 func (builder *Builder) getFieldItem(value string) string {
 	var alias string
-	if len(builder.aliasName) > 0 {
+	if len(builder.aliasName) > 0 && !strings.Contains(value, ".") {
 		alias = builder.aliasName + "."
 	}
+
 	return alias + value
 }
 

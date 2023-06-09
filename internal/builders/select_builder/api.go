@@ -24,9 +24,17 @@ func (builder *Builder) Build() string {
 
 	// where template
 	if len(builder.conditions) > 0 {
-		var where string
-		where += "WHERE \n" + builder.conditions
+		where := "WHERE \n" + builder.conditions
 		queries = append(queries, where)
+	}
+
+	// order by
+	if len(builder.orderFields) > 0 {
+		orderQueries := make([]string, 0, len(builder.orderFields))
+		for _, item := range builder.orderFields {
+			orderQueries = append(orderQueries, builder.getFieldItem(item))
+		}
+		queries = append(queries, "ORDER BY "+strings.Join(orderQueries, ", ")+" "+builder.orderType)
 	}
 
 	// offset template
@@ -95,6 +103,12 @@ func (builder *Builder) Where(conditions ...string) *Builder {
 		conditionArray = append(conditionArray, "\n\t"+item)
 	}
 	builder.conditions += strings.Join(conditionArray, " AND ")
+	return builder
+}
+
+func (builder *Builder) OrderBy(orderType string, fieldList ...string) *Builder {
+	builder.orderType = orderType
+	builder.orderFields = fieldList
 	return builder
 }
 
