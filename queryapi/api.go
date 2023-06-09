@@ -7,18 +7,18 @@ import (
 	"github.com/lowl11/lazy-entity/internal/builders/update_builder"
 )
 
-func Select(tableName string) *select_builder.Builder {
-	return select_builder.New(tableName)
+func Select(fields ...string) *select_builder.Builder {
+	return select_builder.New(fields...)
 }
 
-func Insert(tableName string) *insert_builder.Builder {
-	return insert_builder.New(tableName)
+func Insert() *insert_builder.Builder {
+	return insert_builder.New()
 }
 
-func Update(tableName string) *update_builder.Builder {
-	return update_builder.New(tableName)
+func Update() *update_builder.Builder {
+	return update_builder.New()
 }
 
-func Delete(tableName string) *delete_builder.Builder {
-	return delete_builder.New(tableName)
+func Delete() *delete_builder.Builder {
+	return delete_builder.New()
 }

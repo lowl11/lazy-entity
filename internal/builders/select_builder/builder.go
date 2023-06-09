@@ -1,21 +1,17 @@
 package select_builder
 
-import "github.com/lowl11/lazy-entity/internal/entity_domain"
-
 type Builder struct {
-	tableName string
-	aliasName string
+	fieldList []string
 
-	fieldList     []string
-	conditionList []entity_domain.ConditionPair
-	joinList      []entity_domain.JoinPair
+	tableName  string
+	aliasName  string
+	joinList   []joinModel
+	conditions string
 }
 
-func New(tableName string) *Builder {
+func New(fields ...string) *Builder {
 	return &Builder{
-		tableName:     tableName,
-		fieldList:     make([]string, 0),
-		conditionList: make([]entity_domain.ConditionPair, 0),
-		joinList:      make([]entity_domain.JoinPair, 0),
+		fieldList: fields,
+		joinList:  make([]joinModel, 0),
 	}
 }
