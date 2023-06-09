@@ -17,7 +17,19 @@ func ToString(anyValue any) string {
 	switch value.Kind() {
 	case reflect.String:
 		stringValue := anyValue.(string)
-		if len(stringValue) > 0 && stringValue[0] == '$' {
+
+		// if this is counter variable like $1
+		if len(stringValue) > 1 && stringValue[0] == '$' && IsNumber(rune(stringValue[1])) {
+			return stringValue
+		}
+
+		// if this is variable like :id
+		if stringValue != "" && stringValue[0] == ':' {
+			return stringValue
+		}
+
+		// if this is variable for join fields
+		if stringValue != "" && stringValue[0] == '$' {
 			return stringValue[1:]
 		}
 
@@ -43,4 +55,13 @@ func ToString(anyValue any) string {
 	default:
 		return fmt.Sprintf("%v", value)
 	}
+}
+
+func IsNumber(value rune) bool {
+	switch value {
+	case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
+		return true
+	}
+
+	return false
 }

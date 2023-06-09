@@ -118,11 +118,11 @@ func (builder *Builder) Equal(field string, value any) string {
 	return builder.getFieldItem(field) + " = " + type_helper.ToString(value)
 }
 
-func (builder *Builder) Like(field string, value any) string {
+func (builder *Builder) Like(field string, value string) string {
 	return builder.getFieldItem(field) + " LIKE " + type_helper.ToString(value)
 }
 
-func (builder *Builder) ILike(field string, value any) string {
+func (builder *Builder) ILike(field string, value string) string {
 	return builder.getFieldItem(field) + " ILIKE " + type_helper.ToString(value)
 }
 
