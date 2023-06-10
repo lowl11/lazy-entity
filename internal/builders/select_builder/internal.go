@@ -16,7 +16,7 @@ func (builder *Builder) getFields() string {
 	if len(builder.aliasName) > 0 {
 		aliasedFields := make([]string, 0, len(builder.fieldList))
 		array.NewWithList[string](builder.fieldList...).Each(func(item string) {
-			aliasedFields = append(aliasedFields, builder.getFieldItem(item))
+			aliasedFields = append(aliasedFields, "\n\t"+builder.getFieldItem(item))
 		})
 
 		return strings.Join(aliasedFields, ", ")

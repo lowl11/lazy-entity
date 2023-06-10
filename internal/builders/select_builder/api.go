@@ -10,7 +10,7 @@ func (builder *Builder) Build() string {
 	queries := make([]string, 0, 3)
 
 	// main template
-	main := "SELECT " + builder.getFields() + " FROM " + builder.getTableName()
+	main := "SELECT " + builder.getFields() + "\nFROM " + builder.getTableName()
 	queries = append(queries, main)
 
 	// join template
@@ -24,7 +24,7 @@ func (builder *Builder) Build() string {
 
 	// where template
 	if len(builder.conditions) > 0 {
-		where := "WHERE \n" + builder.conditions
+		where := "WHERE " + builder.conditions
 		queries = append(queries, where)
 	}
 
