@@ -2,13 +2,13 @@ package script_service
 
 import "strings"
 
-// StartScript get script from folder /resources/scripts/start/<script_file>.sql
-func (event *Service) StartScript(script string) string {
+// GetStartScript get script from folder /resources/scripts/start/<script_file>.sql
+func (event *Service) GetStartScript(script string) string {
 	return event.startScripts[script+".sql"]
 }
 
-// Script get script from folder /resources/script/<folder>/<script_file>.sql
-func (event *Service) Script(folder, script string) string {
+// GetScript get script from folder /resources/script/<folder>/<script_file>.sql
+func (event *Service) GetScript(folder, script string) string {
 	// remove .sql
 	script = strings.ReplaceAll(script, ".sql", "")
 
