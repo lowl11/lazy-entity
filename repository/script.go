@@ -6,6 +6,8 @@ import (
 )
 
 type IScriptRepository interface {
+	IRepository
+
 	Script(folder, script string) string
 	StartScript(script string) string
 }

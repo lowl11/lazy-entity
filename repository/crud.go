@@ -8,6 +8,8 @@ import (
 )
 
 type ICrudRepository[T any, ID repositories.IComparableID] interface {
+	IRepository
+
 	Count() (int, error)
 	ExistByID(id ID) (bool, error)
 
