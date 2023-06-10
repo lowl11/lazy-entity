@@ -23,6 +23,11 @@ func (builder *Builder) Build() string {
 		queries = append(queries, "ON CONFLICT DO "+builder.onConflict)
 	}
 
+	// returning template
+	if len(builder.returningFields) > 0 {
+		queries = append(queries, "RETURNING "+strings.Join(builder.returningFields, ", "))
+	}
+
 	return strings.Join(queries, "\n")
 }
 
@@ -48,5 +53,10 @@ func (builder *Builder) OnConflict(query string) *Builder {
 
 func (builder *Builder) SkipConflict() *Builder {
 	builder.skipConflict = true
+	return builder
+}
+
+func (builder *Builder) Returning(fields ...string) *Builder {
+	builder.returningFields = append(builder.returningFields, fields...)
 	return builder
 }
