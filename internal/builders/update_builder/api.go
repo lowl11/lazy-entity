@@ -15,6 +15,12 @@ func (builder *Builder) Build() string {
 	// set template
 	if len(builder.setValues) > 0 {
 		queries = append(queries, "SET\n"+strings.Join(builder.setValues, ",\n"))
+	} else if len(builder.setFields) > 0 {
+		setList := make([]string, 0, len(builder.setFields))
+		for _, item := range builder.setFields {
+			setList = append(setList, "\t"+item+" = :"+item)
+		}
+		queries = append(queries, "SET\n"+strings.Join(setList, ",\n"))
 	}
 
 	// where template
@@ -28,6 +34,11 @@ func (builder *Builder) Build() string {
 
 func (builder *Builder) Set(field string, value any) *Builder {
 	builder.setValues = append(builder.setValues, "\t"+field+" = "+type_helper.ToString(value))
+	return builder
+}
+
+func (builder *Builder) SetByFields(fields ...string) *Builder {
+	builder.setFields = append(builder.setFields, fields...)
 	return builder
 }
 

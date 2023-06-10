@@ -1,6 +1,8 @@
 package crud_repository
 
 import (
+	"github.com/lowl11/lazy-entity/internal/builders/update_builder"
+	"github.com/lowl11/lazy-entity/internal/helpers/type_helper"
 	"github.com/lowl11/lazy-entity/queryapi"
 )
 
@@ -123,6 +125,80 @@ func (repo *CrudRepository[T, ID]) AddList(entityList []T) error {
 		Build()
 
 	if _, err := repo.connection.NamedExecContext(ctx, query, entityList); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (repo *CrudRepository[T, ID]) SaveByID(id ID, entity T) error {
+	ctx, cancel := repo.Ctx()
+	defer cancel()
+
+	builder := queryapi.Update(repo.tableName)
+	query := builder.
+		SetByFields(repo.fieldList...).
+		Where(builder.Equal("id", id)).
+		Build()
+
+	if _, err := repo.connection.NamedExecContext(ctx, query, entity); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (repo *CrudRepository[T, ID]) SaveByCondition(
+	conditionFunc func(builder *update_builder.Builder) string,
+	entity T,
+) error {
+	ctx, cancel := repo.Ctx()
+	defer cancel()
+
+	builder := queryapi.Update(repo.tableName)
+	query := builder.
+		SetByFields(repo.fieldList...).
+		Where(conditionFunc(builder)).
+		Build()
+
+	if _, err := repo.connection.NamedExecContext(ctx, query, entity); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (repo *CrudRepository[T, ID]) UpdateByID(id ID, updateEntity any) error {
+	ctx, cancel := repo.Ctx()
+	defer cancel()
+
+	builder := queryapi.Update(repo.tableName)
+	query := builder.
+		SetByFields(type_helper.GetStructFieldsByObject(updateEntity)...).
+		Where(builder.Equal("id", id)).
+		Build()
+
+	if _, err := repo.connection.NamedExecContext(ctx, query, updateEntity); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (repo *CrudRepository[T, ID]) UpdateByCondition(
+	conditionFunc func(builder *update_builder.Builder) string,
+	updateEntity any,
+) error {
+	ctx, cancel := repo.Ctx()
+	defer cancel()
+
+	builder := queryapi.Update(repo.tableName)
+	query := builder.
+		SetByFields(type_helper.GetStructFieldsByObject(updateEntity)...).
+		Where(conditionFunc(builder)).
+		Build()
+
+	if _, err := repo.connection.NamedExecContext(ctx, query, updateEntity); err != nil {
 		return err
 	}
 

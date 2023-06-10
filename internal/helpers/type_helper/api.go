@@ -67,8 +67,17 @@ func IsNumber(value rune) bool {
 }
 
 func GetStructFields[T any]() []string {
-	var empty T
-	element := reflect.TypeOf(empty)
+	var object T
+	element := reflect.TypeOf(object)
+	fieldList := make([]string, 0, element.NumField())
+	for i := 0; i < element.NumField(); i++ {
+		fieldList = append(fieldList, element.Field(i).Tag.Get("db"))
+	}
+	return fieldList
+}
+
+func GetStructFieldsByObject(object any) []string {
+	element := reflect.TypeOf(object)
 	fieldList := make([]string, 0, element.NumField())
 	for i := 0; i < element.NumField(); i++ {
 		fieldList = append(fieldList, element.Field(i).Tag.Get("db"))
