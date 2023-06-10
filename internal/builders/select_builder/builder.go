@@ -12,17 +12,19 @@ type Builder struct {
 	orderFields      []string
 	orderType        string
 	havingExpression string
+	groupByFields    []string
 	offset           int
 	limit            int
 }
 
 func New(fields ...string) *Builder {
 	return &Builder{
-		fieldList:   fields,
-		joinList:    make([]joinModel, 0),
-		orderFields: make([]string, 0),
-		orderType:   order_types.Asc,
-		offset:      -1,
-		limit:       -1,
+		fieldList:     fields,
+		joinList:      make([]joinModel, 0),
+		orderFields:   make([]string, 0),
+		orderType:     order_types.Asc,
+		groupByFields: make([]string, 0),
+		offset:        -1,
+		limit:         -1,
 	}
 }

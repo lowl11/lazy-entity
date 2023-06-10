@@ -37,6 +37,15 @@ func (builder *Builder) Build() string {
 		queries = append(queries, "ORDER BY "+strings.Join(orderQueries, ", ")+" "+builder.orderType)
 	}
 
+	// group by template
+	if len(builder.groupByFields) > 0 {
+		groupQueries := make([]string, 0, len(builder.groupByFields))
+		for _, item := range builder.groupByFields {
+			groupQueries = append(groupQueries, builder.getFieldItem(item))
+		}
+		queries = append(queries, "GROUP BY "+strings.Join(groupQueries, ", "))
+	}
+
 	// having template
 	if builder.havingExpression != "" {
 		queries = append(queries, "HAVING "+builder.havingExpression)
@@ -122,7 +131,8 @@ func (builder *Builder) Having(expression string) *Builder {
 	return builder
 }
 
-func (builder *Builder) GroupBy(field ...string) *Builder {
+func (builder *Builder) GroupBy(fields ...string) *Builder {
+	builder.groupByFields = append(builder.groupByFields, fields...)
 	return builder
 }
 
