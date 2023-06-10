@@ -1,8 +1,10 @@
 package repository
 
 import (
+	"github.com/jmoiron/sqlx"
 	"github.com/lowl11/lazy-entity/internal/builders/update_builder"
 	"github.com/lowl11/lazy-entity/internal/repositories"
+	"github.com/lowl11/lazy-entity/internal/repositories/crud_repository"
 )
 
 type ICrudRepository[T any, ID repositories.IComparableID] interface {
@@ -30,4 +32,12 @@ type ICrudRepository[T any, ID repositories.IComparableID] interface {
 
 	DeleteAll() error
 	DeleteByID(id ID) error
+}
+
+func NewCrud[T any, ID repositories.IComparableID](connection *sqlx.DB, tableName string, aliasName ...string) *crud_repository.CrudRepository[T, ID] {
+	var alias string
+	if len(aliasName) > 0 {
+		alias = aliasName[0]
+	}
+	return crud_repository.New[T, ID](connection, tableName).Alias(alias)
 }

@@ -2,7 +2,7 @@ package select_builder
 
 import (
 	"github.com/lowl11/lazy-entity/internal/helpers/type_helper"
-	"github.com/lowl11/lazy-entity/internal/join_types"
+	"github.com/lowl11/lazy-entity/join_types"
 	"strings"
 )
 
