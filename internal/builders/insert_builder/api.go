@@ -2,35 +2,6 @@ package insert_builder
 
 import "strings"
 
-/*
-insert into guarantees (
-        id,
-        sum,
-        status,
-
-        initiator_iin,
-        initiator_colvir_id,
-        initiator_phone,
-
-        principial_bin,
-        principial_company_type,
-        principial_colvir_id
-)
-values (
-        :id,
-        :sum,
-        :status,
-
-        :initiator_iin,
-        :initiator_colvir_id,
-        :initiator_phone,
-
-        :principial_bin,
-        :principial_company_type,
-        :principial_colvir_id
-)
-*/
-
 func (builder *Builder) Build() string {
 	queries := make([]string, 0, 3)
 

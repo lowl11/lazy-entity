@@ -15,8 +15,8 @@ func Insert(tableName string) *insert_builder.Builder {
 	return insert_builder.New(tableName)
 }
 
-func Update() *update_builder.Builder {
-	return update_builder.New()
+func Update(tableName string) *update_builder.Builder {
+	return update_builder.New(tableName)
 }
 
 func Delete() *delete_builder.Builder {
