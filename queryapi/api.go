@@ -11,8 +11,8 @@ func Select(fields ...string) *select_builder.Builder {
 	return select_builder.New(fields...)
 }
 
-func Insert() *insert_builder.Builder {
-	return insert_builder.New()
+func Insert(tableName string) *insert_builder.Builder {
+	return insert_builder.New(tableName)
 }
 
 func Update() *update_builder.Builder {

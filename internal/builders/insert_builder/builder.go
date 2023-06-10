@@ -1,9 +1,15 @@
 package insert_builder
 
 type Builder struct {
-	query string
+	tableName string
+
+	fieldList    []string
+	variableMode bool
 }
 
-func New() *Builder {
-	return &Builder{}
+func New(tableName string) *Builder {
+	return &Builder{
+		tableName: tableName,
+		fieldList: make([]string, 0),
+	}
 }

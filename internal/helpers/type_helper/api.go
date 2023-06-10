@@ -65,3 +65,13 @@ func IsNumber(value rune) bool {
 
 	return false
 }
+
+func GetStructFields[T any]() []string {
+	var empty T
+	element := reflect.TypeOf(empty)
+	fieldList := make([]string, 0, element.NumField())
+	for i := 0; i < element.NumField(); i++ {
+		fieldList = append(fieldList, element.Field(i).Tag.Get("db"))
+	}
+	return fieldList
+}
