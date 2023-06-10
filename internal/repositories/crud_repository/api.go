@@ -37,6 +37,26 @@ func (repo *CrudRepository[T, ID]) Count() (int, error) {
 	return count, nil
 }
 
+func (repo *CrudRepository[T, ID]) ExistByID(id ID) (bool, error) {
+	ctx, cancel := repo.Ctx()
+	defer cancel()
+
+	builder := queryapi.Select()
+	query := builder.
+		Fields(repo.idName).
+		From(repo.tableName).
+		Where(builder.Equal(repo.idName, "$1")).
+		Build()
+
+	rows, err := repo.connection.QueryxContext(ctx, query, id)
+	if err != nil {
+		return false, err
+	}
+	defer repo.CloseRows(rows)
+
+	return rows.Next(), nil
+}
+
 func (repo *CrudRepository[T, ID]) GetAll() ([]T, error) {
 	ctx, cancel := repo.Ctx()
 	defer cancel()
@@ -94,13 +114,15 @@ func (repo *CrudRepository[T, ID]) GetByID(id ID) (*T, error) {
 	return nil, nil
 }
 
-func (repo *CrudRepository[T, ID]) Add(entity T) (ID, error) {
+func (repo *CrudRepository[T, ID]) Add(entity any) (ID, error) {
 	ctx, cancel := repo.Ctx()
 	defer cancel()
 
+	fieldList := type_helper.GetStructFieldsByObject(entity)
+
 	query := queryapi.
 		Insert(repo.tableName).
-		Fields(repo.fieldListWithoutID()...).
+		Fields(fieldList...).
 		Returning(repo.idName).
 		VariableMode().
 		Build()
@@ -122,13 +144,19 @@ func (repo *CrudRepository[T, ID]) Add(entity T) (ID, error) {
 	return id, nil
 }
 
-func (repo *CrudRepository[T, ID]) AddList(entityList []T) error {
+func (repo *CrudRepository[T, ID]) AddList(entityList []any) error {
+	if len(entityList) == 0 {
+		return nil
+	}
+
 	ctx, cancel := repo.Ctx()
 	defer cancel()
 
+	fieldList := type_helper.GetStructFieldsByObject(entityList[0])
+
 	query := queryapi.
 		Insert(repo.tableName).
-		Fields(repo.fieldListWithoutID()...).
+		Fields(fieldList...).
 		Returning(repo.idName).
 		VariableMode().
 		Build()
@@ -243,24 +271,4 @@ func (repo *CrudRepository[T, ID]) DeleteByID(id ID) error {
 	}
 
 	return nil
-}
-
-func (repo *CrudRepository[T, ID]) ExistByID(id ID) (bool, error) {
-	ctx, cancel := repo.Ctx()
-	defer cancel()
-
-	builder := queryapi.Select()
-	query := builder.
-		Fields(repo.idName).
-		From(repo.tableName).
-		Where(builder.Equal(repo.idName, "$1")).
-		Build()
-
-	rows, err := repo.connection.QueryxContext(ctx, query, id)
-	if err != nil {
-		return false, err
-	}
-	defer repo.CloseRows(rows)
-
-	return rows.Next(), nil
 }

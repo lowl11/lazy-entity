@@ -16,8 +16,8 @@ type ICrudRepository[T any, ID repositories.IComparableID] interface {
 	GetAll() ([]T, error)
 	GetByID(id ID) (*T, error)
 
-	Add(entity T) (ID, error)
-	AddList(entityList []T) error
+	Add(entity any) (ID, error)
+	AddList(entityList []any) error
 
 	SaveByID(id ID, entity T) error
 
