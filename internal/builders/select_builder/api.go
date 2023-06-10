@@ -28,13 +28,18 @@ func (builder *Builder) Build() string {
 		queries = append(queries, where)
 	}
 
-	// order by
+	// order by template
 	if len(builder.orderFields) > 0 {
 		orderQueries := make([]string, 0, len(builder.orderFields))
 		for _, item := range builder.orderFields {
 			orderQueries = append(orderQueries, builder.getFieldItem(item))
 		}
 		queries = append(queries, "ORDER BY "+strings.Join(orderQueries, ", ")+" "+builder.orderType)
+	}
+
+	// having template
+	if builder.havingExpression != "" {
+		queries = append(queries, "HAVING "+builder.havingExpression)
 	}
 
 	// offset template
@@ -112,6 +117,39 @@ func (builder *Builder) OrderBy(orderType string, fieldList ...string) *Builder 
 	return builder
 }
 
+func (builder *Builder) Having(expression string) *Builder {
+	builder.havingExpression = expression
+	return builder
+}
+
+func (builder *Builder) Count(field string, value any, expression func(field string, value any) string) string {
+	fieldName := builder.getFieldItem(field)
+	expressionValue := expression(field, value)
+	expressionValue = strings.ReplaceAll(expressionValue, fieldName, "")
+	return "COUNT(" + fieldName + ")" + expressionValue
+}
+
+func (builder *Builder) Min(field string, value any, expression func(field string, value any) string) string {
+	fieldName := builder.getFieldItem(field)
+	expressionValue := expression(field, value)
+	expressionValue = strings.ReplaceAll(expressionValue, fieldName, "")
+	return "MIN(" + fieldName + ")" + expressionValue
+}
+
+func (builder *Builder) Max(field string, value any, expression func(field string, value any) string) string {
+	fieldName := builder.getFieldItem(field)
+	expressionValue := expression(field, value)
+	expressionValue = strings.ReplaceAll(expressionValue, fieldName, "")
+	return "MAX(" + fieldName + ")" + expressionValue
+}
+
+func (builder *Builder) Avg(field string, value any, expression func(field string, value any) string) string {
+	fieldName := builder.getFieldItem(field)
+	expressionValue := expression(field, value)
+	expressionValue = strings.ReplaceAll(expressionValue, fieldName, "")
+	return "AVG(" + fieldName + ")" + expressionValue
+}
+
 func (builder *Builder) And(conditions ...string) string {
 	conditionArray := make([]string, 0, len(conditions))
 	for _, item := range conditions {
@@ -138,6 +176,22 @@ func (builder *Builder) Like(field string, value string) string {
 
 func (builder *Builder) ILike(field string, value string) string {
 	return builder.getFieldItem(field) + " ILIKE " + type_helper.ToString(value)
+}
+
+func (builder *Builder) Gte(field string, value any) string {
+	return builder.getFieldItem(field) + " >= " + type_helper.ToString(value)
+}
+
+func (builder *Builder) Gt(field string, value any) string {
+	return builder.getFieldItem(field) + " > " + type_helper.ToString(value)
+}
+
+func (builder *Builder) Lte(field string, value any) string {
+	return builder.getFieldItem(field) + " <= " + type_helper.ToString(value)
+}
+
+func (builder *Builder) Lt(field string, value any) string {
+	return builder.getFieldItem(field) + " < " + type_helper.ToString(value)
 }
 
 func (builder *Builder) Offset(value int) *Builder {

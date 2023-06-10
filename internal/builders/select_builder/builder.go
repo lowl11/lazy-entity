@@ -5,14 +5,15 @@ import "github.com/lowl11/lazy-entity/order_types"
 type Builder struct {
 	fieldList []string
 
-	tableName   string
-	aliasName   string
-	joinList    []joinModel
-	conditions  string
-	orderFields []string
-	orderType   string
-	offset      int
-	limit       int
+	tableName        string
+	aliasName        string
+	joinList         []joinModel
+	conditions       string
+	orderFields      []string
+	orderType        string
+	havingExpression string
+	offset           int
+	limit            int
 }
 
 func New(fields ...string) *Builder {
