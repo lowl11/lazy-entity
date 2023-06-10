@@ -19,6 +19,6 @@ func Update(tableName string) *update_builder.Builder {
 	return update_builder.New(tableName)
 }
 
-func Delete() *delete_builder.Builder {
-	return delete_builder.New()
+func Delete(tableName string) *delete_builder.Builder {
+	return delete_builder.New(tableName)
 }

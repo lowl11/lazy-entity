@@ -1,9 +1,13 @@
 package delete_builder
 
 type Builder struct {
-	query string
+	tableName string
+
+	conditions string
 }
 
-func New() *Builder {
-	return &Builder{}
+func New(tableName string) *Builder {
+	return &Builder{
+		tableName: tableName,
+	}
 }
