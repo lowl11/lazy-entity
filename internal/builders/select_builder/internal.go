@@ -1,7 +1,6 @@
 package select_builder
 
 import (
-	"github.com/lowl11/lazy-collection/array"
 	"github.com/lowl11/lazy-entity/internal/helpers/sql_helper"
 	"github.com/lowl11/lazy-entity/internal/helpers/type_helper"
 	"regexp"
@@ -10,19 +9,23 @@ import (
 
 func (builder *Builder) getFields() string {
 	if len(builder.fieldList) == 0 {
-		return "*"
+		return "\n\t*"
 	}
 
 	if len(builder.aliasName) > 0 {
 		aliasedFields := make([]string, 0, len(builder.fieldList))
-		array.NewWithList[string](builder.fieldList...).Each(func(item string) {
+		for _, item := range builder.fieldList {
 			aliasedFields = append(aliasedFields, "\n\t"+builder.getFieldItem(item))
-		})
+		}
 
 		return strings.Join(aliasedFields, ", ")
 	}
 
-	return strings.Join(builder.fieldList, ", ")
+	tabFieldList := make([]string, 0, len(builder.fieldList))
+	for _, item := range builder.fieldList {
+		tabFieldList = append(tabFieldList, "\n\t"+item)
+	}
+	return strings.Join(tabFieldList, ", ")
 }
 
 func (builder *Builder) getFieldItem(value string) string {
