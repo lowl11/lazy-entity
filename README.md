@@ -1,7 +1,10 @@
 # lazy-entity
 
-> Library like EntityFramework on C# <br>
-> Building simple repositories to build SQL queries
+> SQL builder & mini-ORM library<br>
+> mini-ORM - creating simple repositories which are based on SQL builder
+
+## SQL Builder
+<hr>
 
 ### SELECT
 Go
@@ -120,4 +123,41 @@ SQL
 DELETE FROM users
 WHERE 
         (id = 5 OR id > 10)
+```
+
+## mini-ORM
+<hr>
+
+Create Crud-Repository
+```go
+repository.NewCrud[Entity, int](connection, "contacts", "contact")
+```
+
+Methods
+```go
+Count() (int, error)
+ExistByID(id ID) (bool, error)
+
+GetAll() ([]T, error)
+GetByID(id ID) (*T, error)
+GetByIdList(id []ID) ([]T, error)
+
+Add(entity any) (ID, error)
+AddList(entityList []any) error
+
+SaveByID(id ID, entity T) error
+
+SaveByCondition(
+    conditionFunc func(builder *update_builder.Builder) string,
+    entity T,
+) error
+
+UpdateByID(id ID, updateEntity any) error
+UpdateByCondition(
+    conditionFunc func(builder *update_builder.Builder) string,
+    updateEntity any,
+) error
+
+DeleteAll() error
+DeleteByID(id ID) error
 ```
