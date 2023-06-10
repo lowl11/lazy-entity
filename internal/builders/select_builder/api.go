@@ -122,6 +122,10 @@ func (builder *Builder) Having(expression string) *Builder {
 	return builder
 }
 
+func (builder *Builder) GroupBy(field ...string) *Builder {
+	return builder
+}
+
 func (builder *Builder) Count(field string, value any, expression func(field string, value any) string) string {
 	fieldName := builder.getFieldItem(field)
 	expressionValue := expression(field, value)

@@ -2,7 +2,9 @@ package select_builder
 
 import (
 	"github.com/lowl11/lazy-collection/array"
+	"github.com/lowl11/lazy-entity/internal/helpers/sql_helper"
 	"github.com/lowl11/lazy-entity/internal/helpers/type_helper"
+	"regexp"
 	"strings"
 )
 
@@ -14,12 +16,7 @@ func (builder *Builder) getFields() string {
 	if len(builder.aliasName) > 0 {
 		aliasedFields := make([]string, 0, len(builder.fieldList))
 		array.NewWithList[string](builder.fieldList...).Each(func(item string) {
-			if strings.Contains(item, ".") {
-				aliasedFields = append(aliasedFields, item)
-				return
-			}
-
-			aliasedFields = append(aliasedFields, builder.aliasName+"."+item)
+			aliasedFields = append(aliasedFields, builder.getFieldItem(item))
 		})
 
 		return strings.Join(aliasedFields, ", ")
@@ -29,6 +26,17 @@ func (builder *Builder) getFields() string {
 }
 
 func (builder *Builder) getFieldItem(value string) string {
+	// check aggregate function
+	if sql_helper.ContainsAggregate(value) {
+		reg, _ := regexp.Compile(".*?\\((.*?)\\)")
+		match := reg.FindAllStringSubmatch(value, -1)
+
+		if len(match) > 0 && len(match[0]) > 1 {
+			return strings.ReplaceAll(value, match[0][1], builder.getFieldItem(match[0][1]))
+		}
+	}
+
+	// check alias name
 	var alias string
 	if len(builder.aliasName) > 0 && !strings.Contains(value, ".") {
 		alias = builder.aliasName + "."
