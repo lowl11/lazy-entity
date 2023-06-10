@@ -36,10 +36,15 @@ type ICrudRepository[T any, ID repositories.IComparableID] interface {
 	DeleteByID(id ID) error
 }
 
-func NewCrud[T any, ID repositories.IComparableID](connection *sqlx.DB, tableName string, aliasName ...string) *crud_repository.CrudRepository[T, ID] {
+func NewCrud[T any, ID repositories.IComparableID](connection *sqlx.DB, tableName string, params ...string) *crud_repository.CrudRepository[T, ID] {
 	var alias string
-	if len(aliasName) > 0 {
-		alias = aliasName[0]
+	var idName string
+
+	if len(params) > 0 {
+		alias = params[0]
 	}
-	return crud_repository.New[T, ID](connection, tableName).Alias(alias)
+	if len(params) > 1 {
+		idName = params[1]
+	}
+	return crud_repository.New[T, ID](connection, tableName).Alias(alias).IdName(idName)
 }

@@ -12,6 +12,7 @@ type CrudRepository[T any, ID repositories.IComparableID] struct {
 	connection *sqlx.DB
 	tableName  string
 	aliasName  string
+	idName     string
 	fieldList  []string
 }
 
@@ -19,6 +20,7 @@ func New[T any, ID repositories.IComparableID](connection *sqlx.DB, tableName st
 	return &CrudRepository[T, ID]{
 		connection: connection,
 		tableName:  tableName,
+		idName:     defaultIdName,
 		fieldList:  type_helper.GetStructFields[T](),
 	}
 }

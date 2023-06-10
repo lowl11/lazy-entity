@@ -11,6 +11,15 @@ func (repo *CrudRepository[T, ID]) Alias(aliasName string) *CrudRepository[T, ID
 	return repo
 }
 
+func (repo *CrudRepository[T, ID]) IdName(name string) *CrudRepository[T, ID] {
+	if name == "" {
+		return repo
+	}
+
+	repo.idName = name
+	return repo
+}
+
 func (repo *CrudRepository[T, ID]) Count() (int, error) {
 	ctx, cancel := repo.Ctx()
 	defer cancel()
@@ -65,7 +74,7 @@ func (repo *CrudRepository[T, ID]) GetByID(id ID) (*T, error) {
 		Fields(repo.fieldList...).
 		From(repo.tableName).
 		Alias(repo.aliasName).
-		Where(builder.Equal("id", "$1")).
+		Where(builder.Equal(repo.idName, "$1")).
 		Build()
 
 	rows, err := repo.connection.QueryxContext(ctx, query, id)
@@ -92,7 +101,7 @@ func (repo *CrudRepository[T, ID]) Add(entity T) (ID, error) {
 	query := queryapi.
 		Insert(repo.tableName).
 		Fields(repo.fieldListWithoutID()...).
-		Returning("id").
+		Returning(repo.idName).
 		VariableMode().
 		Build()
 
@@ -120,7 +129,7 @@ func (repo *CrudRepository[T, ID]) AddList(entityList []T) error {
 	query := queryapi.
 		Insert(repo.tableName).
 		Fields(repo.fieldListWithoutID()...).
-		Returning("id").
+		Returning(repo.idName).
 		VariableMode().
 		Build()
 
@@ -138,7 +147,7 @@ func (repo *CrudRepository[T, ID]) SaveByID(id ID, entity T) error {
 	builder := queryapi.Update(repo.tableName)
 	query := builder.
 		SetByFields(repo.fieldList...).
-		Where(builder.Equal("id", id)).
+		Where(builder.Equal(repo.idName, id)).
 		Build()
 
 	if _, err := repo.connection.NamedExecContext(ctx, query, entity); err != nil {
@@ -175,7 +184,7 @@ func (repo *CrudRepository[T, ID]) UpdateByID(id ID, updateEntity any) error {
 	builder := queryapi.Update(repo.tableName)
 	query := builder.
 		SetByFields(type_helper.GetStructFieldsByObject(updateEntity)...).
-		Where(builder.Equal("id", id)).
+		Where(builder.Equal(repo.idName, id)).
 		Build()
 
 	if _, err := repo.connection.NamedExecContext(ctx, query, updateEntity); err != nil {
@@ -226,7 +235,7 @@ func (repo *CrudRepository[T, ID]) DeleteByID(id ID) error {
 
 	builder := queryapi.Delete(repo.tableName)
 	query := builder.
-		Where(builder.Equal("id", id)).
+		Where(builder.Equal(repo.idName, id)).
 		Build()
 
 	if _, err := repo.connection.ExecContext(ctx, query); err != nil {
@@ -242,9 +251,9 @@ func (repo *CrudRepository[T, ID]) ExistByID(id ID) (bool, error) {
 
 	builder := queryapi.Select()
 	query := builder.
-		Fields("id").
+		Fields(repo.idName).
 		From(repo.tableName).
-		Where(builder.Equal("id", "$1")).
+		Where(builder.Equal(repo.idName, "$1")).
 		Build()
 
 	rows, err := repo.connection.QueryxContext(ctx, query, id)
