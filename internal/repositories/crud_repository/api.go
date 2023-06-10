@@ -1,6 +1,7 @@
 package crud_repository
 
 import (
+	"github.com/lib/pq"
 	"github.com/lowl11/lazy-entity/internal/builders/update_builder"
 	"github.com/lowl11/lazy-entity/internal/helpers/type_helper"
 	"github.com/lowl11/lazy-entity/queryapi"
@@ -112,6 +113,36 @@ func (repo *CrudRepository[T, ID]) GetByID(id ID) (*T, error) {
 	}
 
 	return nil, nil
+}
+
+func (repo *CrudRepository[T, ID]) GetByIdList(id []ID) ([]T, error) {
+	ctx, cancel := repo.Ctx()
+	defer cancel()
+
+	builder := queryapi.Select()
+	query := builder.
+		Fields(repo.fieldList...).
+		From(repo.tableName).
+		Alias(repo.aliasName).
+		Where(builder.In(repo.idName, "$1")).
+		Build()
+
+	rows, err := repo.connection.QueryxContext(ctx, query, pq.Array(id))
+	if err != nil {
+		return nil, err
+	}
+	defer repo.CloseRows(rows)
+
+	list := make([]T, 0)
+	for rows.Next() {
+		var item T
+		if err = rows.StructScan(&item); err != nil {
+			return nil, err
+		}
+		list = append(list, item)
+	}
+
+	return list, nil
 }
 
 func (repo *CrudRepository[T, ID]) Add(entity any) (ID, error) {
