@@ -11,6 +11,7 @@ type IUniversalRepository[T any, ID repositories.IComparableID] interface {
 	IRepository
 
 	GetList(func(builder *select_builder.Builder), ...any) ([]T, error)
+	GetItem(func(builder *select_builder.Builder), ...any) (*T, error)
 }
 
 func NewUniversal[T any, ID repositories.IComparableID](

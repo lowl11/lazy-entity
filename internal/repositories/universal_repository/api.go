@@ -48,3 +48,33 @@ func (repo *Repository[T, ID]) GetList(customizeFunc func(builder *select_builde
 
 	return list, nil
 }
+
+func (repo *Repository[T, ID]) GetItem(customizeFunc func(builder *select_builder.Builder), args ...any) (*T, error) {
+	ctx, cancel := repo.Ctx()
+	defer cancel()
+
+	builder := queryapi.Select()
+	builder.
+		Fields(repo.fieldList...).
+		From(repo.tableName).
+		Alias(repo.aliasName).
+		Limit(1)
+
+	customizeFunc(builder)
+
+	rows, err := repo.connection.QueryxContext(ctx, builder.Build(), args...)
+	if err != nil {
+		return nil, err
+	}
+	defer repo.CloseRows(rows)
+
+	if rows.Next() {
+		var item T
+		if err = rows.StructScan(&item); err != nil {
+			return nil, err
+		}
+		return &item, nil
+	}
+
+	return nil, nil
+}
