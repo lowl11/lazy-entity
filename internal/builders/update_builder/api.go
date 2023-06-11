@@ -50,35 +50,3 @@ func (builder *Builder) Where(conditions ...string) *Builder {
 	builder.conditions += strings.Join(conditionArray, " AND ")
 	return builder
 }
-
-func (builder *Builder) Equal(field string, value any) string {
-	return builder.getFieldItem(field) + " = " + type_helper.ToString(value)
-}
-
-func (builder *Builder) In(field string, value any) string {
-	return builder.getFieldItem(field) + " IN " + type_helper.ToString(value)
-}
-
-func (builder *Builder) Like(field string, value string) string {
-	return builder.getFieldItem(field) + " LIKE " + type_helper.ToString(value)
-}
-
-func (builder *Builder) ILike(field string, value string) string {
-	return builder.getFieldItem(field) + " ILIKE " + type_helper.ToString(value)
-}
-
-func (builder *Builder) Gte(field string, value any) string {
-	return builder.getFieldItem(field) + " >= " + type_helper.ToString(value)
-}
-
-func (builder *Builder) Gt(field string, value any) string {
-	return builder.getFieldItem(field) + " > " + type_helper.ToString(value)
-}
-
-func (builder *Builder) Lte(field string, value any) string {
-	return builder.getFieldItem(field) + " <= " + type_helper.ToString(value)
-}
-
-func (builder *Builder) Lt(field string, value any) string {
-	return builder.getFieldItem(field) + " < " + type_helper.ToString(value)
-}

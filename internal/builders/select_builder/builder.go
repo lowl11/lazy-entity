@@ -1,10 +1,14 @@
 package select_builder
 
-import "github.com/lowl11/lazy-entity/order_types"
+import (
+	"github.com/lowl11/lazy-entity/internal/builders/condition_builder"
+	"github.com/lowl11/lazy-entity/order_types"
+)
 
 type Builder struct {
-	fieldList []string
+	condition_builder.Builder
 
+	fieldList        []string
 	tableName        string
 	aliasName        string
 	joinList         []joinModel
@@ -18,7 +22,7 @@ type Builder struct {
 }
 
 func New(fields ...string) *Builder {
-	return &Builder{
+	builder := &Builder{
 		fieldList:     fields,
 		joinList:      make([]joinModel, 0),
 		orderFields:   make([]string, 0),
@@ -27,4 +31,7 @@ func New(fields ...string) *Builder {
 		offset:        -1,
 		limit:         -1,
 	}
+
+	builder.Builder = condition_builder.New(builder.getFieldItem)
+	return builder
 }
