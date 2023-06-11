@@ -201,7 +201,7 @@ func (repo *CrudRepository[T, ID]) SaveByID(id ID, entity T) error {
 
 	builder := queryapi.Update(repo.tableName)
 	query := builder.
-		SetByFields(repo.fieldList...).
+		SetByFields(repo.getFieldList()...).
 		Where(builder.Equal(repo.idName, id)).
 		Build()
 
@@ -221,7 +221,7 @@ func (repo *CrudRepository[T, ID]) SaveByCondition(
 
 	builder := queryapi.Update(repo.tableName)
 	query := builder.
-		SetByFields(repo.fieldList...).
+		SetByFields(repo.getFieldList()...).
 		Where(conditionFunc(builder)).
 		Build()
 
