@@ -19,7 +19,7 @@ func (repo *Repository[T, ID]) IdName(name string) *Repository[T, ID] {
 	return repo
 }
 
-func (repo *Repository[T, ID]) GetList(conditionFunc func(builder *select_builder.Builder) string, args ...any) ([]T, error) {
+func (repo *Repository[T, ID]) GetList(customizeFunc func(builder *select_builder.Builder), args ...any) ([]T, error) {
 	ctx, cancel := repo.Ctx()
 	defer cancel()
 
@@ -27,8 +27,9 @@ func (repo *Repository[T, ID]) GetList(conditionFunc func(builder *select_builde
 	builder.
 		Fields(repo.fieldList...).
 		From(repo.tableName).
-		Alias(repo.aliasName).
-		Where(conditionFunc(builder))
+		Alias(repo.aliasName)
+
+	customizeFunc(builder)
 
 	rows, err := repo.connection.QueryxContext(ctx, builder.Build(), args...)
 	if err != nil {
@@ -44,5 +45,6 @@ func (repo *Repository[T, ID]) GetList(conditionFunc func(builder *select_builde
 		}
 		list = append(list, item)
 	}
+
 	return list, nil
 }

@@ -4,6 +4,7 @@ import (
 	"github.com/lib/pq"
 	"github.com/lowl11/lazy-entity/internal/builders/update_builder"
 	"github.com/lowl11/lazy-entity/internal/helpers/type_helper"
+	"github.com/lowl11/lazy-entity/order_types"
 	"github.com/lowl11/lazy-entity/queryapi"
 )
 
@@ -66,6 +67,7 @@ func (repo *CrudRepository[T, ID]) GetAll() ([]T, error) {
 		Select(repo.fieldList...).
 		From(repo.tableName).
 		Alias(repo.aliasName).
+		OrderBy(order_types.Asc, repo.idName).
 		Build()
 
 	rows, err := repo.connection.QueryxContext(ctx, query)
@@ -125,6 +127,7 @@ func (repo *CrudRepository[T, ID]) GetByIdList(id []ID) ([]T, error) {
 		From(repo.tableName).
 		Alias(repo.aliasName).
 		Where(builder.In(repo.idName, "$1")).
+		OrderBy(order_types.Asc, repo.idName).
 		Build()
 
 	rows, err := repo.connection.QueryxContext(ctx, query, pq.Array(id))

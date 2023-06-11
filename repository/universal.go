@@ -10,7 +10,7 @@ import (
 type IUniversalRepository[T any, ID repositories.IComparableID] interface {
 	IRepository
 
-	GetList(conditionFunc func(builder *select_builder.Builder) string, args ...any) ([]T, error)
+	GetList(func(builder *select_builder.Builder), ...any) ([]T, error)
 }
 
 func NewUniversal[T any, ID repositories.IComparableID](
