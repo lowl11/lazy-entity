@@ -1,10 +1,10 @@
 package queryapi
 
 import (
-	"github.com/lowl11/lazy-entity/internal/builders/delete_builder"
-	"github.com/lowl11/lazy-entity/internal/builders/insert_builder"
-	"github.com/lowl11/lazy-entity/internal/builders/select_builder"
-	"github.com/lowl11/lazy-entity/internal/builders/update_builder"
+	"github.com/lowl11/lazy-entity/builders/delete_builder"
+	"github.com/lowl11/lazy-entity/builders/insert_builder"
+	"github.com/lowl11/lazy-entity/builders/select_builder"
+	"github.com/lowl11/lazy-entity/builders/update_builder"
 )
 
 func Select(fields ...string) *select_builder.Builder {

@@ -2,7 +2,7 @@ package repository
 
 import (
 	"github.com/jmoiron/sqlx"
-	"github.com/lowl11/lazy-entity/internal/builders/update_builder"
+	"github.com/lowl11/lazy-entity/builders/update_builder"
 	"github.com/lowl11/lazy-entity/internal/repositories"
 	"github.com/lowl11/lazy-entity/internal/repositories/crud_repository"
 )

@@ -2,7 +2,7 @@ package crud_repository
 
 import (
 	"github.com/lib/pq"
-	"github.com/lowl11/lazy-entity/internal/builders/update_builder"
+	"github.com/lowl11/lazy-entity/builders/update_builder"
 	"github.com/lowl11/lazy-entity/internal/helpers/type_helper"
 	"github.com/lowl11/lazy-entity/order_types"
 	"github.com/lowl11/lazy-entity/queryapi"

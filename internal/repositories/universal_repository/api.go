@@ -1,7 +1,7 @@
 package universal_repository
 
 import (
-	"github.com/lowl11/lazy-entity/internal/builders/select_builder"
+	"github.com/lowl11/lazy-entity/builders/select_builder"
 	"github.com/lowl11/lazy-entity/queryapi"
 )
 

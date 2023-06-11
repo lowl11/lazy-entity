@@ -1,7 +1,7 @@
 package select_builder
 
 import (
-	"github.com/lowl11/lazy-entity/internal/builders/condition_builder"
+	"github.com/lowl11/lazy-entity/builders/condition_builder"
 	"github.com/lowl11/lazy-entity/order_types"
 )
 
