@@ -84,3 +84,15 @@ func GetStructFieldsByObject(object any) []string {
 	}
 	return fieldList
 }
+
+func GetObjectNonEmptyIndices(object any) []int {
+	element := reflect.ValueOf(object).Elem()
+
+	list := make([]int, 0, element.NumField())
+	for i := 0; i < element.NumField(); i++ {
+		if !element.Field(i).IsZero() {
+			list = append(list, i)
+		}
+	}
+	return list
+}

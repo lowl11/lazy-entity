@@ -145,15 +145,13 @@ func (repo *CrudRepository[T, ID]) GetByIdList(id []ID) ([]T, error) {
 	return list, nil
 }
 
-func (repo *CrudRepository[T, ID]) Add(entity any) (ID, error) {
+func (repo *CrudRepository[T, ID]) Add(entity T) (ID, error) {
 	ctx, cancel := repo.Ctx()
 	defer cancel()
 
-	fieldList := type_helper.GetStructFieldsByObject(entity)
-
 	query := queryapi.
 		Insert(repo.tableName).
-		Fields(fieldList...).
+		Fields(repo.getFieldList()...).
 		Returning(repo.idName).
 		VariableMode().
 		Build()
@@ -175,7 +173,7 @@ func (repo *CrudRepository[T, ID]) Add(entity any) (ID, error) {
 	return id, nil
 }
 
-func (repo *CrudRepository[T, ID]) AddList(entityList []any) error {
+func (repo *CrudRepository[T, ID]) AddList(entityList []T) error {
 	if len(entityList) == 0 {
 		return nil
 	}
@@ -183,11 +181,9 @@ func (repo *CrudRepository[T, ID]) AddList(entityList []any) error {
 	ctx, cancel := repo.Ctx()
 	defer cancel()
 
-	fieldList := type_helper.GetStructFieldsByObject(entityList[0])
-
 	query := queryapi.
 		Insert(repo.tableName).
-		Fields(fieldList...).
+		Fields(repo.getFieldList()...).
 		Returning(repo.idName).
 		VariableMode().
 		Build()
@@ -236,17 +232,18 @@ func (repo *CrudRepository[T, ID]) SaveByCondition(
 	return nil
 }
 
-func (repo *CrudRepository[T, ID]) UpdateByID(id ID, updateEntity any) error {
+func (repo *CrudRepository[T, ID]) UpdateByID(id ID, entity T) error {
 	ctx, cancel := repo.Ctx()
 	defer cancel()
 
 	builder := queryapi.Update(repo.tableName)
-	query := builder.
-		SetByFields(type_helper.GetStructFieldsByObject(updateEntity)...).
-		Where(builder.Equal(repo.idName, id)).
-		Build()
+	builder.
+		Where(builder.Equal(repo.idName, id))
 
-	if _, err := repo.connection.NamedExecContext(ctx, query, updateEntity); err != nil {
+	nonEmptyIndices := type_helper.GetObjectNonEmptyIndices(&entity)
+	builder.SetByFields(repo.getNonEmptyFields(nonEmptyIndices)...)
+
+	if _, err := repo.connection.NamedExecContext(ctx, builder.Build(), entity); err != nil {
 		return err
 	}
 
@@ -255,18 +252,20 @@ func (repo *CrudRepository[T, ID]) UpdateByID(id ID, updateEntity any) error {
 
 func (repo *CrudRepository[T, ID]) UpdateByCondition(
 	conditionFunc func(builder *update_builder.Builder) string,
-	updateEntity any,
+	entity T,
 ) error {
 	ctx, cancel := repo.Ctx()
 	defer cancel()
 
 	builder := queryapi.Update(repo.tableName)
 	query := builder.
-		SetByFields(type_helper.GetStructFieldsByObject(updateEntity)...).
 		Where(conditionFunc(builder)).
 		Build()
 
-	if _, err := repo.connection.NamedExecContext(ctx, query, updateEntity); err != nil {
+	nonEmptyIndices := type_helper.GetObjectNonEmptyIndices(&entity)
+	builder.SetByFields(repo.getNonEmptyFields(nonEmptyIndices)...)
+
+	if _, err := repo.connection.NamedExecContext(ctx, query, entity); err != nil {
 		return err
 	}
 

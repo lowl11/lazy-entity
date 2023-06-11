@@ -17,27 +17,26 @@ type ICrudRepository[T any, ID repositories.IComparableID] interface {
 	GetByID(id ID) (*T, error)
 	GetByIdList(id []ID) ([]T, error)
 
-	Add(entity any) (ID, error)
-	AddList(entityList []any) error
+	Add(entity T) (ID, error)
+	AddList(entityList []T) error
 
 	SaveByID(id ID, entity T) error
-
 	SaveByCondition(
 		conditionFunc func(builder *update_builder.Builder) string,
 		entity T,
 	) error
 
-	UpdateByID(id ID, updateEntity any) error
+	UpdateByID(id ID, entity T) error
 	UpdateByCondition(
 		conditionFunc func(builder *update_builder.Builder) string,
-		updateEntity any,
+		entity T,
 	) error
 
 	DeleteAll() error
 	DeleteByID(id ID) error
 }
 
-func NewCrud[T any, ID repositories.IComparableID](connection *sqlx.DB, tableName string, params ...string) *crud_repository.CrudRepository[T, ID] {
+func NewCrud[T any, ID repositories.IComparableID](connection *sqlx.DB, tableName string, params ...string) ICrudRepository[T, ID] {
 	var alias string
 	var idName string
 
