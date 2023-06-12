@@ -1,6 +1,7 @@
 package universal_repository
 
 import (
+	"github.com/lowl11/lazy-entity/builders/delete_builder"
 	"github.com/lowl11/lazy-entity/builders/select_builder"
 	"github.com/lowl11/lazy-entity/queryapi"
 )
@@ -77,4 +78,18 @@ func (repo *Repository[T, ID]) GetItem(customizeFunc func(builder *select_builde
 	}
 
 	return nil, nil
+}
+
+func (repo *Repository[T, ID]) DeleteItem(customizeFunc func(builder *delete_builder.Builder), args ...any) error {
+	ctx, cancel := repo.Ctx()
+	defer cancel()
+
+	builder := queryapi.Delete(repo.tableName)
+	customizeFunc(builder)
+
+	if _, err := repo.connection.ExecContext(ctx, builder.Build(), args...); err != nil {
+		return err
+	}
+
+	return nil
 }

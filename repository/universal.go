@@ -2,6 +2,7 @@ package repository
 
 import (
 	"github.com/jmoiron/sqlx"
+	"github.com/lowl11/lazy-entity/builders/delete_builder"
 	"github.com/lowl11/lazy-entity/builders/select_builder"
 	"github.com/lowl11/lazy-entity/internal/repositories"
 	"github.com/lowl11/lazy-entity/internal/repositories/universal_repository"
@@ -12,6 +13,7 @@ type IUniversalRepository[T any, ID repositories.IComparableID] interface {
 
 	GetList(func(builder *select_builder.Builder), ...any) ([]T, error)
 	GetItem(func(builder *select_builder.Builder), ...any) (*T, error)
+	DeleteItem(customizeFunc func(builder *delete_builder.Builder), args ...any) error
 }
 
 func NewUniversal[T any, ID repositories.IComparableID](
