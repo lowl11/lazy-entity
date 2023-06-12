@@ -76,7 +76,14 @@ func (builder *Builder) From(tableName string) *Builder {
 }
 
 func (builder *Builder) Alias(aliasName string) *Builder {
-	builder.aliasName = aliasName
+	var alias string
+	if aliasName == "user" {
+		alias = "\"" + aliasName + "\""
+	} else {
+		alias = aliasName
+	}
+
+	builder.aliasName = alias
 	return builder
 }
 
