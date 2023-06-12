@@ -47,6 +47,26 @@ func (builder *Builder) Where(conditions ...string) *Builder {
 	for _, item := range conditions {
 		conditionArray = append(conditionArray, "\n\t"+item)
 	}
-	builder.conditions += strings.Join(conditionArray, " AND ")
+
+	if builder.conditions == "" {
+		builder.conditions += strings.Join(conditionArray, " AND ")
+	} else {
+		builder.conditions += " AND " + strings.Join(conditionArray, " AND ")
+	}
+
+	return builder
+}
+
+func (builder *Builder) WhereOr(conditions ...string) *Builder {
+	conditionArray := make([]string, 0, len(conditions))
+	for _, item := range conditions {
+		conditionArray = append(conditionArray, "\n\t"+item)
+	}
+	if builder.conditions == "" {
+		builder.conditions += strings.Join(conditionArray, " AND ")
+	} else {
+		builder.conditions += " OR " + strings.Join(conditionArray, " AND ")
+	}
+
 	return builder
 }
