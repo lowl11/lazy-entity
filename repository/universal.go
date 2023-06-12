@@ -1,35 +1,28 @@
 package repository
 
 import (
-	"github.com/jmoiron/sqlx"
 	"github.com/lowl11/lazy-entity/builders/delete_builder"
 	"github.com/lowl11/lazy-entity/builders/select_builder"
+	"github.com/lowl11/lazy-entity/builders/update_builder"
 	"github.com/lowl11/lazy-entity/internal/repositories"
-	"github.com/lowl11/lazy-entity/internal/repositories/universal_repository"
 )
 
 type IUniversalRepository[T any, ID repositories.IComparableID] interface {
 	IRepository
 
+	Count() (int, error)
+	ExistByID(id ID) (bool, error)
+
 	GetList(func(builder *select_builder.Builder), ...any) ([]T, error)
 	GetItem(func(builder *select_builder.Builder), ...any) (*T, error)
-	DeleteItem(customizeFunc func(builder *delete_builder.Builder), args ...any) error
-}
 
-func NewUniversal[T any, ID repositories.IComparableID](
-	connection *sqlx.DB,
-	tableName string,
-	params ...string,
-) IUniversalRepository[T, ID] {
-	var aliasName string
-	var idName string
+	Add(entity T) (ID, error)
+	AddList(entityList []T) error
 
-	if len(params) > 0 {
-		aliasName = params[0]
-	}
-	if len(params) > 1 {
-		idName = params[1]
-	}
+	Update(
+		conditionFunc func(builder *update_builder.Builder) string,
+		entity T,
+	) error
 
-	return universal_repository.New[T, ID](connection, tableName).Alias(aliasName).IdName(idName)
+	Delete(customizeFunc func(builder *delete_builder.Builder), args ...any) error
 }

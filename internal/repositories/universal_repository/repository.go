@@ -20,8 +20,8 @@ type Repository[T any, ID repositories.IComparableID] struct {
 func New[T any, ID repositories.IComparableID](
 	connection *sqlx.DB,
 	tableName string,
-) *Repository[T, ID] {
-	return &Repository[T, ID]{
+) Repository[T, ID] {
+	return Repository[T, ID]{
 		connection: connection,
 		tableName:  tableName,
 		idName:     defaultIdName,

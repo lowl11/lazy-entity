@@ -145,13 +145,6 @@ GetByIdList(id []ID) ([]T, error)
 Add(entity any) (ID, error)
 AddList(entityList []any) error
 
-SaveByID(id ID, entity T) error
-
-SaveByCondition(
-    conditionFunc func(builder *update_builder.Builder) string,
-    entity T,
-) error
-
 UpdateByID(id ID, updateEntity any) error
 UpdateByCondition(
     conditionFunc func(builder *update_builder.Builder) string,
