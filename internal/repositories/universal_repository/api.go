@@ -262,20 +262,20 @@ func (repo *Repository[T, ID]) AddListWithID(entityList []T) error {
 }
 
 func (repo *Repository[T, ID]) Update(
-	conditionFunc func(builder *update_builder.Builder) string,
+	customizeFunc func(builder *update_builder.Builder),
 	entity T,
 ) error {
 	ctx, cancel := repo.Ctx()
 	defer cancel()
 
 	builder := queryapi.Update(repo.tableName)
-	query := builder.
-		Where(conditionFunc(builder)).
-		Build()
 
 	nonEmptyIndices := type_helper.GetObjectNonEmptyIndices(&entity)
 	builder.SetByFields(repo.getNonEmptyFields(nonEmptyIndices)...)
 
+	customizeFunc(builder)
+
+	query := builder.Build()
 	if repo.debug {
 		fmt.Println(query)
 	}
