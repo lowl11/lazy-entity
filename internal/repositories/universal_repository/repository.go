@@ -5,6 +5,7 @@ import (
 	"github.com/lowl11/lazy-entity/internal/helpers/type_helper"
 	"github.com/lowl11/lazy-entity/internal/repositories"
 	"github.com/lowl11/lazy-entity/internal/repositories/base_repository"
+	"github.com/lowl11/lazy-entity/repo_config"
 )
 
 type Repository[T any, ID repositories.IComparableID] struct {
@@ -15,6 +16,7 @@ type Repository[T any, ID repositories.IComparableID] struct {
 
 	aliasName string
 	idName    string
+	joinList  []repo_config.Join
 }
 
 func New[T any, ID repositories.IComparableID](
@@ -26,5 +28,6 @@ func New[T any, ID repositories.IComparableID](
 		tableName:  tableName,
 		idName:     defaultIdName,
 		fieldList:  type_helper.GetStructFields[T](),
+		joinList:   make([]repo_config.Join, 0),
 	}
 }

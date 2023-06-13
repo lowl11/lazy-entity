@@ -1,17 +1,28 @@
 package universal_repository
 
+import (
+	"strings"
+)
+
 const (
 	defaultIdName = "id"
 )
 
-func (repo *Repository[T, ID]) getFieldList() []string {
+func (repo *Repository[T, ID]) getFieldList(withID bool) []string {
 	fieldList := make([]string, 0, len(repo.fieldList))
 	for _, item := range repo.fieldList {
-		if item == repo.idName {
+		if !withID && item == repo.idName {
 			continue
 		}
 
-		fieldList = append(fieldList, item)
+		fieldName := item
+
+		// join field
+		if strings.Contains(fieldName, "_") {
+			fieldName = strings.Replace(fieldName, "_", ".", 1) + " " + fieldName
+		}
+
+		fieldList = append(fieldList, fieldName)
 	}
 	return fieldList
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/lowl11/lazy-entity/builders/update_builder"
 	"github.com/lowl11/lazy-entity/internal/helpers/type_helper"
 	"github.com/lowl11/lazy-entity/queryapi"
+	"github.com/lowl11/lazy-entity/repo_config"
 )
 
 func (repo *Repository[T, ID]) Alias(aliasName string) *Repository[T, ID] {
@@ -19,6 +20,11 @@ func (repo *Repository[T, ID]) IdName(name string) *Repository[T, ID] {
 	}
 
 	repo.idName = name
+	return repo
+}
+
+func (repo *Repository[T, ID]) Joins(joinList ...repo_config.Join) *Repository[T, ID] {
+	repo.joinList = append(repo.joinList, joinList...)
 	return repo
 }
 
@@ -69,9 +75,13 @@ func (repo *Repository[T, ID]) GetList(customizeFunc func(builder *select_builde
 
 	builder := queryapi.Select()
 	builder.
-		Fields(repo.fieldList...).
+		Fields(repo.getFieldList(true)...).
 		From(repo.tableName).
 		Alias(repo.aliasName)
+
+	for _, item := range repo.joinList {
+		builder.Join(item.TableName, item.AliasName, item.Condition(builder))
+	}
 
 	customizeFunc(builder)
 
@@ -129,7 +139,7 @@ func (repo *Repository[T, ID]) Add(entity T) (ID, error) {
 
 	query := queryapi.
 		Insert(repo.tableName).
-		Fields(repo.getFieldList()...).
+		Fields(repo.getFieldList(false)...).
 		Returning(repo.idName).
 		VariableMode().
 		Build()
@@ -161,7 +171,7 @@ func (repo *Repository[T, ID]) AddList(entityList []T) error {
 
 	query := queryapi.
 		Insert(repo.tableName).
-		Fields(repo.getFieldList()...).
+		Fields(repo.getFieldList(false)...).
 		VariableMode().
 		Build()
 
