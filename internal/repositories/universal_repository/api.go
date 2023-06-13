@@ -161,6 +161,24 @@ func (repo *Repository[T, ID]) Add(entity T) (ID, error) {
 	return id, nil
 }
 
+func (repo *Repository[T, ID]) AddWithID(entity T) error {
+	ctx, cancel := repo.Ctx()
+	defer cancel()
+
+	query := queryapi.
+		Insert(repo.tableName).
+		Fields(repo.getFieldList(true)...).
+		Returning(repo.idName).
+		VariableMode().
+		Build()
+
+	if _, err := repo.connection.NamedExecContext(ctx, query, entity); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (repo *Repository[T, ID]) AddList(entityList []T) error {
 	if len(entityList) == 0 {
 		return nil

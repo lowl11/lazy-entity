@@ -17,6 +17,7 @@ type IUniversalRepository[T any, ID repositories.IComparableID] interface {
 	GetItem(func(builder *select_builder.Builder), ...any) (*T, error)
 
 	Add(entity T) (ID, error)
+	AddWithID(entity T) error
 	AddList(entityList []T) error
 
 	Update(
