@@ -71,10 +71,31 @@ func GetStructFields[T any]() []string {
 	element := reflect.TypeOf(object)
 	fieldList := make([]string, 0, element.NumField())
 	for i := 0; i < element.NumField(); i++ {
-		fieldList = append(fieldList, element.Field(i).Tag.Get("db"))
+		fieldValue := element.Field(i).Tag.Get("db")
+		if fieldValue == "" {
+			continue
+		}
+
+		fieldList = append(fieldList, fieldValue)
 	}
 	return fieldList
 }
+
+//func GetStructRelations[T any]() []string {
+//	var object T
+//	element := reflect.TypeOf(object)
+//	fieldList := make([]string, 0, element.NumField())
+//	for i := 0; i < element.NumField(); i++ {
+//		fieldValue := element.Field(i).Tag.Get("repo")
+//		if fieldValue == "" {
+//			continue
+//		}
+//
+//		newRelationObject := reflect.New(element.Field(i).Type)
+//		fieldList = append(fieldList, fieldValue)
+//	}
+//	return fieldList
+//}
 
 func GetStructFieldsByObject(object any) []string {
 	element := reflect.TypeOf(object)

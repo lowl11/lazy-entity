@@ -66,7 +66,7 @@ func (builder *Builder) Build() string {
 }
 
 func (builder *Builder) Fields(fieldList ...string) *Builder {
-	builder.fieldList = fieldList
+	builder.fieldList = append(builder.fieldList, fieldList...)
 	return builder
 }
 
