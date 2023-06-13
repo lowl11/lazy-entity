@@ -1,6 +1,7 @@
 package universal_repository
 
 import (
+	"fmt"
 	"github.com/lowl11/lazy-entity/builders/delete_builder"
 	"github.com/lowl11/lazy-entity/builders/select_builder"
 	"github.com/lowl11/lazy-entity/builders/update_builder"
@@ -32,6 +33,11 @@ func (repo *Repository[T, ID]) GetIdName() string {
 	return repo.idName
 }
 
+func (repo *Repository[T, ID]) Debug() *Repository[T, ID] {
+	repo.debug = true
+	return repo
+}
+
 func (repo *Repository[T, ID]) ExistByID(id ID) (bool, error) {
 	ctx, cancel := repo.Ctx()
 	defer cancel()
@@ -42,6 +48,10 @@ func (repo *Repository[T, ID]) ExistByID(id ID) (bool, error) {
 		From(repo.tableName).
 		Where(builder.Equal(repo.idName, "$1")).
 		Build()
+
+	if repo.debug {
+		fmt.Println(query)
+	}
 
 	rows, err := repo.connection.QueryxContext(ctx, query, id)
 	if err != nil {
@@ -60,6 +70,10 @@ func (repo *Repository[T, ID]) Count() (int, error) {
 		Select("count(*)").
 		From(repo.tableName).
 		Build()
+
+	if repo.debug {
+		fmt.Println(query)
+	}
 
 	count := -1
 	if err := repo.connection.QueryRowxContext(ctx, query).Scan(&count); err != nil {
@@ -85,7 +99,12 @@ func (repo *Repository[T, ID]) GetList(customizeFunc func(builder *select_builde
 
 	customizeFunc(builder)
 
-	rows, err := repo.connection.QueryxContext(ctx, builder.Build(), args...)
+	query := builder.Build()
+	if repo.debug {
+		fmt.Println(query)
+	}
+
+	rows, err := repo.connection.QueryxContext(ctx, query, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +135,12 @@ func (repo *Repository[T, ID]) GetItem(customizeFunc func(builder *select_builde
 
 	customizeFunc(builder)
 
-	rows, err := repo.connection.QueryxContext(ctx, builder.Build(), args...)
+	query := builder.Build()
+	if repo.debug {
+		fmt.Println(query)
+	}
+
+	rows, err := repo.connection.QueryxContext(ctx, query, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -143,6 +167,10 @@ func (repo *Repository[T, ID]) Add(entity T) (ID, error) {
 		Returning(repo.idName).
 		VariableMode().
 		Build()
+
+	if repo.debug {
+		fmt.Println(query)
+	}
 
 	var id ID
 	rows, err := repo.connection.NamedQueryContext(ctx, query, entity)
@@ -172,6 +200,10 @@ func (repo *Repository[T, ID]) AddWithID(entity T) error {
 		VariableMode().
 		Build()
 
+	if repo.debug {
+		fmt.Println(query)
+	}
+
 	if _, err := repo.connection.NamedExecContext(ctx, query, entity); err != nil {
 		return err
 	}
@@ -193,6 +225,10 @@ func (repo *Repository[T, ID]) AddList(entityList []T) error {
 		VariableMode().
 		Build()
 
+	if repo.debug {
+		fmt.Println(query)
+	}
+
 	if _, err := repo.connection.NamedExecContext(ctx, query, entityList); err != nil {
 		return err
 	}
@@ -213,6 +249,10 @@ func (repo *Repository[T, ID]) AddListWithID(entityList []T) error {
 		Fields(repo.getFieldList(true)...).
 		VariableMode().
 		Build()
+
+	if repo.debug {
+		fmt.Println(query)
+	}
 
 	if _, err := repo.connection.NamedExecContext(ctx, query, entityList); err != nil {
 		return err
@@ -236,6 +276,10 @@ func (repo *Repository[T, ID]) Update(
 	nonEmptyIndices := type_helper.GetObjectNonEmptyIndices(&entity)
 	builder.SetByFields(repo.getNonEmptyFields(nonEmptyIndices)...)
 
+	if repo.debug {
+		fmt.Println(query)
+	}
+
 	if _, err := repo.connection.NamedExecContext(ctx, query, entity); err != nil {
 		return err
 	}
@@ -250,7 +294,12 @@ func (repo *Repository[T, ID]) Delete(customizeFunc func(builder *delete_builder
 	builder := queryapi.Delete(repo.tableName)
 	customizeFunc(builder)
 
-	if _, err := repo.connection.ExecContext(ctx, builder.Build(), args...); err != nil {
+	query := builder.Build()
+	if repo.debug {
+		fmt.Println(query)
+	}
+
+	if _, err := repo.connection.ExecContext(ctx, query, args...); err != nil {
 		return err
 	}
 

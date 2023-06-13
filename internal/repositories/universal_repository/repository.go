@@ -17,6 +17,8 @@ type Repository[T any, ID repositories.IComparableID] struct {
 	aliasName string
 	idName    string
 	joinList  []repo_config.Join
+
+	debug bool
 }
 
 func New[T any, ID repositories.IComparableID](
