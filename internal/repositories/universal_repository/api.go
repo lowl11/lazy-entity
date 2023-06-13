@@ -89,7 +89,7 @@ func (repo *Repository[T, ID]) GetList(customizeFunc func(builder *select_builde
 
 	builder := queryapi.Select()
 	builder.
-		Fields(repo.getFieldList(true)...).
+		Fields(repo.getFieldsWithJoin(true)...).
 		From(repo.tableName).
 		Alias(repo.aliasName)
 
@@ -128,10 +128,14 @@ func (repo *Repository[T, ID]) GetItem(customizeFunc func(builder *select_builde
 
 	builder := queryapi.Select()
 	builder.
-		Fields(repo.fieldList...).
+		Fields(repo.getFieldsWithJoin(true)...).
 		From(repo.tableName).
 		Alias(repo.aliasName).
 		Limit(1)
+
+	for _, item := range repo.joinList {
+		builder.Join(item.TableName, item.AliasName, item.Condition(builder))
+	}
 
 	customizeFunc(builder)
 
@@ -163,7 +167,7 @@ func (repo *Repository[T, ID]) Add(entity T) (ID, error) {
 
 	query := queryapi.
 		Insert(repo.tableName).
-		Fields(repo.getFieldList(false)...).
+		Fields(repo.getFields(false)...).
 		Returning(repo.idName).
 		VariableMode().
 		Build()
@@ -195,7 +199,7 @@ func (repo *Repository[T, ID]) AddWithID(entity T) error {
 
 	query := queryapi.
 		Insert(repo.tableName).
-		Fields(repo.getFieldList(true)...).
+		Fields(repo.getFields(true)...).
 		Returning(repo.idName).
 		VariableMode().
 		Build()
@@ -221,7 +225,7 @@ func (repo *Repository[T, ID]) AddList(entityList []T) error {
 
 	query := queryapi.
 		Insert(repo.tableName).
-		Fields(repo.getFieldList(false)...).
+		Fields(repo.getFields(false)...).
 		VariableMode().
 		Build()
 
@@ -246,7 +250,7 @@ func (repo *Repository[T, ID]) AddListWithID(entityList []T) error {
 
 	query := queryapi.
 		Insert(repo.tableName).
-		Fields(repo.getFieldList(true)...).
+		Fields(repo.getFields(true)...).
 		VariableMode().
 		Build()
 

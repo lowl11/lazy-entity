@@ -3,6 +3,7 @@ package type_helper
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/lowl11/lazy-entity/internal/join_field"
 	"reflect"
 	"strconv"
 )
@@ -66,36 +67,33 @@ func IsNumber(value rune) bool {
 	return false
 }
 
-func GetStructFields[T any]() []string {
+func GetStructFields[T any]() ([]string, []join_field.Field) {
 	var object T
 	element := reflect.TypeOf(object)
 	fieldList := make([]string, 0, element.NumField())
+	joinFieldList := make([]join_field.Field, 0, element.NumField())
+
 	for i := 0; i < element.NumField(); i++ {
 		fieldValue := element.Field(i).Tag.Get("db")
+		joinName, joinFound := element.Field(i).Tag.Lookup("join")
+
 		if fieldValue == "" {
+			continue
+		}
+
+		if joinFound {
+			joinFieldList = append(joinFieldList, join_field.Field{
+				Name:     fieldValue,
+				Relation: joinName,
+			})
 			continue
 		}
 
 		fieldList = append(fieldList, fieldValue)
 	}
-	return fieldList
-}
 
-//func GetStructRelations[T any]() []string {
-//	var object T
-//	element := reflect.TypeOf(object)
-//	fieldList := make([]string, 0, element.NumField())
-//	for i := 0; i < element.NumField(); i++ {
-//		fieldValue := element.Field(i).Tag.Get("repo")
-//		if fieldValue == "" {
-//			continue
-//		}
-//
-//		newRelationObject := reflect.New(element.Field(i).Type)
-//		fieldList = append(fieldList, fieldValue)
-//	}
-//	return fieldList
-//}
+	return fieldList, joinFieldList
+}
 
 func GetStructFieldsByObject(object any) []string {
 	element := reflect.TypeOf(object)
