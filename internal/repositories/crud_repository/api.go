@@ -27,8 +27,8 @@ func (repo *Repository[T, ID]) GetByIdList(id []ID) ([]T, error) {
 }
 
 func (repo *Repository[T, ID]) UpdateByID(id ID, entity T) error {
-	return repo.Update(func(builder *update_builder.Builder) string {
-		return builder.Equal(repo.GetIdName(), id)
+	return repo.Update(func(builder *update_builder.Builder) {
+		builder.Where(builder.Equal(repo.GetIdName(), id))
 	}, entity)
 }
 
