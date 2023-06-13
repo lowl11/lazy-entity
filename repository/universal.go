@@ -22,7 +22,7 @@ type IUniversalRepository[T any, ID repositories.IComparableID] interface {
 	AddListWithID(entityList []T) error
 
 	Update(
-		conditionFunc func(builder *update_builder.Builder) string,
+		customizeFunc func(builder *update_builder.Builder),
 		entity T,
 	) error
 
