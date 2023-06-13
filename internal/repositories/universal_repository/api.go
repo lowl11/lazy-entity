@@ -200,6 +200,27 @@ func (repo *Repository[T, ID]) AddList(entityList []T) error {
 	return nil
 }
 
+func (repo *Repository[T, ID]) AddListWithID(entityList []T) error {
+	if len(entityList) == 0 {
+		return nil
+	}
+
+	ctx, cancel := repo.Ctx()
+	defer cancel()
+
+	query := queryapi.
+		Insert(repo.tableName).
+		Fields(repo.getFieldList(true)...).
+		VariableMode().
+		Build()
+
+	if _, err := repo.connection.NamedExecContext(ctx, query, entityList); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (repo *Repository[T, ID]) Update(
 	conditionFunc func(builder *update_builder.Builder) string,
 	entity T,
