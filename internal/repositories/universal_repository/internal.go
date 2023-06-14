@@ -1,6 +1,8 @@
 package universal_repository
 
-import "strings"
+import (
+	"strings"
+)
 
 const (
 	defaultIdName = "id"
@@ -37,7 +39,11 @@ func (repo *Repository[T, ID]) getJoinFields() []string {
 
 func (repo *Repository[T, ID]) getNonEmptyFields(okayIndices []int) []string {
 	fieldList := make([]string, 0, len(okayIndices))
+	fieldsLen := len(repo.fieldList)
 	for _, index := range okayIndices {
+		if index > fieldsLen {
+			continue
+		}
 		fieldList = append(fieldList, repo.fieldList[index])
 	}
 	return fieldList

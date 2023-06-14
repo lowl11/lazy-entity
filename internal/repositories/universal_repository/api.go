@@ -275,8 +275,12 @@ func (repo *Repository[T, ID]) Update(
 	builder := queryapi.Update(repo.tableName)
 
 	nonEmptyIndices := type_helper.GetObjectNonEmptyIndices(&entity)
-	builder.SetByFields(repo.getNonEmptyFields(nonEmptyIndices)...)
+	nonEmptyFields := repo.getNonEmptyFields(nonEmptyIndices)
+	if len(nonEmptyFields) == 0 {
+		return nil
+	}
 
+	builder.SetByFields(nonEmptyFields...)
 	customizeFunc(builder)
 
 	query := builder.Build()
