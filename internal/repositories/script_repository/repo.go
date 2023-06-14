@@ -6,12 +6,13 @@ import (
 )
 
 type Repository struct {
-	base_repository.Repository
+	base   base_repository.Repository
 	script *script_service.Service
 }
 
 func New(script *script_service.Service) *Repository {
 	return &Repository{
+		base:   base_repository.Repository{},
 		script: script,
 	}
 }

@@ -39,7 +39,7 @@ func (repo *Repository[T, ID]) Debug() *Repository[T, ID] {
 }
 
 func (repo *Repository[T, ID]) ExistByID(id ID) (bool, error) {
-	ctx, cancel := repo.Ctx()
+	ctx, cancel := repo.base.Ctx()
 	defer cancel()
 
 	builder := queryapi.Select()
@@ -57,13 +57,13 @@ func (repo *Repository[T, ID]) ExistByID(id ID) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	defer repo.CloseRows(rows)
+	defer repo.base.CloseRows(rows)
 
 	return rows.Next(), nil
 }
 
 func (repo *Repository[T, ID]) Count() (int, error) {
-	ctx, cancel := repo.Ctx()
+	ctx, cancel := repo.base.Ctx()
 	defer cancel()
 
 	query := queryapi.
@@ -84,7 +84,7 @@ func (repo *Repository[T, ID]) Count() (int, error) {
 }
 
 func (repo *Repository[T, ID]) GetList(customizeFunc func(builder *select_builder.Builder), args ...any) ([]T, error) {
-	ctx, cancel := repo.Ctx()
+	ctx, cancel := repo.base.Ctx()
 	defer cancel()
 
 	builder := queryapi.Select()
@@ -108,7 +108,7 @@ func (repo *Repository[T, ID]) GetList(customizeFunc func(builder *select_builde
 	if err != nil {
 		return nil, err
 	}
-	defer repo.CloseRows(rows)
+	defer repo.base.CloseRows(rows)
 
 	list := make([]T, 0)
 	for rows.Next() {
@@ -123,7 +123,7 @@ func (repo *Repository[T, ID]) GetList(customizeFunc func(builder *select_builde
 }
 
 func (repo *Repository[T, ID]) GetItem(customizeFunc func(builder *select_builder.Builder), args ...any) (*T, error) {
-	ctx, cancel := repo.Ctx()
+	ctx, cancel := repo.base.Ctx()
 	defer cancel()
 
 	builder := queryapi.Select()
@@ -148,7 +148,7 @@ func (repo *Repository[T, ID]) GetItem(customizeFunc func(builder *select_builde
 	if err != nil {
 		return nil, err
 	}
-	defer repo.CloseRows(rows)
+	defer repo.base.CloseRows(rows)
 
 	if rows.Next() {
 		var item T
@@ -162,7 +162,7 @@ func (repo *Repository[T, ID]) GetItem(customizeFunc func(builder *select_builde
 }
 
 func (repo *Repository[T, ID]) Add(entity T) (ID, error) {
-	ctx, cancel := repo.Ctx()
+	ctx, cancel := repo.base.Ctx()
 	defer cancel()
 
 	query := queryapi.
@@ -194,7 +194,7 @@ func (repo *Repository[T, ID]) Add(entity T) (ID, error) {
 }
 
 func (repo *Repository[T, ID]) AddWithID(entity T) error {
-	ctx, cancel := repo.Ctx()
+	ctx, cancel := repo.base.Ctx()
 	defer cancel()
 
 	query := queryapi.
@@ -220,7 +220,7 @@ func (repo *Repository[T, ID]) AddList(entityList []T) error {
 		return nil
 	}
 
-	ctx, cancel := repo.Ctx()
+	ctx, cancel := repo.base.Ctx()
 	defer cancel()
 
 	query := queryapi.
@@ -245,7 +245,7 @@ func (repo *Repository[T, ID]) AddListWithID(entityList []T) error {
 		return nil
 	}
 
-	ctx, cancel := repo.Ctx()
+	ctx, cancel := repo.base.Ctx()
 	defer cancel()
 
 	query := queryapi.
@@ -269,7 +269,7 @@ func (repo *Repository[T, ID]) Update(
 	customizeFunc func(builder *update_builder.Builder),
 	entity T,
 ) error {
-	ctx, cancel := repo.Ctx()
+	ctx, cancel := repo.base.Ctx()
 	defer cancel()
 
 	builder := queryapi.Update(repo.tableName)
@@ -296,7 +296,7 @@ func (repo *Repository[T, ID]) Update(
 }
 
 func (repo *Repository[T, ID]) Delete(customizeFunc func(builder *delete_builder.Builder), args ...any) error {
-	ctx, cancel := repo.Ctx()
+	ctx, cancel := repo.base.Ctx()
 	defer cancel()
 
 	builder := queryapi.Delete(repo.tableName)
