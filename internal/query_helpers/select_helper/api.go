@@ -23,3 +23,18 @@ func OrderBy(orderType, orderQueries string) string {
 	orderBy.WriteString(orderType)
 	return orderBy.String()
 }
+
+func Join(joinType, tableName, aliasName, condition string) string {
+	join := strings.Builder{}
+	join.Grow(100)
+	join.WriteString("\t")
+	join.WriteString(joinType)
+	join.WriteString(" JOIN ")
+	join.WriteString(tableName)
+	join.WriteString(" AS ")
+	join.WriteString(aliasName)
+	join.WriteString(" ON (")
+	join.WriteString(condition)
+	join.WriteString(")")
+	return join.String()
+}
