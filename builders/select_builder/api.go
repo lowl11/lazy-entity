@@ -2,16 +2,16 @@ package select_builder
 
 import (
 	"github.com/lowl11/lazy-entity/internal/helpers/sql_helper"
+	"github.com/lowl11/lazy-entity/internal/query_helpers/select_helper"
 	"github.com/lowl11/lazy-entity/join_types"
 	"strings"
 )
 
 func (builder *Builder) Build() string {
-	queries := make([]string, 0, 3)
+	queries := make([]string, 0, 10)
 
 	// main template
-	main := "SELECT " + builder.getFields() + "\nFROM " + builder.getTableName()
-	queries = append(queries, main)
+	queries = append(queries, select_helper.Main(builder.getTableName(), builder.getFields()))
 
 	// join template
 	if len(builder.joinList) > 0 {
@@ -24,8 +24,8 @@ func (builder *Builder) Build() string {
 	}
 
 	// where template
-	if len(builder.conditions) > 0 {
-		where := "WHERE " + builder.conditions
+	if builder.conditions.Len() > 0 {
+		where := "WHERE " + builder.conditions.String()
 		queries = append(queries, where)
 	}
 
@@ -78,14 +78,7 @@ func (builder *Builder) From(tableName string) *Builder {
 }
 
 func (builder *Builder) Alias(aliasName string) *Builder {
-	var alias string
-	if sql_helper.IsKeyword(aliasName) {
-		alias = "\"" + aliasName + "\""
-	} else {
-		alias = aliasName
-	}
-
-	builder.aliasName = alias
+	builder.aliasName = sql_helper.AliasName(aliasName)
 	return builder
 }
 
@@ -124,10 +117,11 @@ func (builder *Builder) Where(conditions ...string) *Builder {
 	for _, item := range conditions {
 		conditionArray = append(conditionArray, "\n\t"+item)
 	}
-	if builder.conditions == "" {
-		builder.conditions += strings.Join(conditionArray, " AND ")
+
+	if builder.conditions.Len() == 0 {
+		builder.conditions.WriteString(strings.Join(conditionArray, " AND "))
 	} else {
-		builder.conditions += " AND " + strings.Join(conditionArray, " AND ")
+		builder.conditions.WriteString(" AND " + strings.Join(conditionArray, " AND "))
 	}
 
 	return builder
@@ -138,10 +132,10 @@ func (builder *Builder) WhereOr(conditions ...string) *Builder {
 	for _, item := range conditions {
 		conditionArray = append(conditionArray, "\n\t"+item)
 	}
-	if builder.conditions == "" {
-		builder.conditions += strings.Join(conditionArray, " AND ")
+	if builder.conditions.Len() == 0 {
+		builder.conditions.WriteString(strings.Join(conditionArray, " AND "))
 	} else {
-		builder.conditions += " OR " + strings.Join(conditionArray, " AND ")
+		builder.conditions.WriteString(" OR " + strings.Join(conditionArray, " AND "))
 	}
 
 	return builder
