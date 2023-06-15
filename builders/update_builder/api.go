@@ -2,6 +2,7 @@ package update_builder
 
 import (
 	"github.com/lowl11/lazy-entity/internal/helpers/type_helper"
+	"github.com/lowl11/lazy-entity/internal/query_helpers/update_helper"
 	"strings"
 )
 
@@ -18,7 +19,7 @@ func (builder *Builder) Build() string {
 	} else if len(builder.setFields) > 0 {
 		setList := make([]string, 0, len(builder.setFields))
 		for _, item := range builder.setFields {
-			setList = append(setList, "\t"+item+" = :"+item)
+			setList = append(setList, update_helper.VariableField(item))
 		}
 		queries = append(queries, "SET\n"+strings.Join(setList, ",\n"))
 	}
