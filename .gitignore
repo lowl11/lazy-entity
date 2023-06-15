@@ -4,4 +4,5 @@ config
 *.log
 logs
 main.go
+main*.go
 app

@@ -1,6 +1,7 @@
 package select_builder
 
 import (
+	"github.com/lowl11/lazy-entity/internal/helpers/sql_helper"
 	"github.com/lowl11/lazy-entity/join_types"
 	"strings"
 )
@@ -77,7 +78,7 @@ func (builder *Builder) From(tableName string) *Builder {
 
 func (builder *Builder) Alias(aliasName string) *Builder {
 	var alias string
-	if aliasName == "user" {
+	if sql_helper.IsKeyword(aliasName) {
 		alias = "\"" + aliasName + "\""
 	} else {
 		alias = aliasName

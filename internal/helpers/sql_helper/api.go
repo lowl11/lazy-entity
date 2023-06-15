@@ -90,3 +90,13 @@ func Ctx(customTimeout ...time.Duration) (context.Context, func()) {
 	}
 	return context.WithTimeout(context.Background(), defaultTimeout)
 }
+
+func IsKeyword(word string) bool {
+	for _, keyword := range keywords {
+		if keyword == word {
+			return true
+		}
+	}
+
+	return false
+}

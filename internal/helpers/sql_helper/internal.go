@@ -5,3 +5,9 @@ const (
 	aggregateMin   = "MIN"
 	aggregateMax   = "MAX"
 )
+
+var (
+	keywords = []string{
+		"id", "group",
+	}
+)
