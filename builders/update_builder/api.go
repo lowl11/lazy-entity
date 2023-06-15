@@ -7,30 +7,34 @@ import (
 )
 
 func (builder *Builder) Build() string {
-	queries := make([]string, 0, 3)
-
 	// main template
-	main := "UPDATE " + builder.tableName
-	queries = append(queries, main)
+	query := strings.Builder{}
+	query.Grow(200)
+	query.WriteString("UPDATE ")
+	query.WriteString(builder.tableName)
+	query.WriteString("\n")
 
 	// set template
+	query.WriteString("SET\n")
 	if len(builder.setValues) > 0 {
-		queries = append(queries, "SET\n"+strings.Join(builder.setValues, ",\n"))
+		query.WriteString(strings.Join(builder.setValues, ",\n"))
 	} else if len(builder.setFields) > 0 {
 		setList := make([]string, 0, len(builder.setFields))
 		for _, item := range builder.setFields {
 			setList = append(setList, update_helper.VariableField(item))
 		}
-		queries = append(queries, "SET\n"+strings.Join(setList, ",\n"))
+		query.WriteString(strings.Join(setList, ",\n"))
 	}
+	query.WriteString("\n")
 
 	// where template
 	if builder.conditions.Len() > 0 {
-		where := "WHERE " + builder.conditions.String()
-		queries = append(queries, where)
+		query.WriteString("WHERE ")
+		query.WriteString(builder.conditions.String())
+		query.WriteString("\n")
 	}
 
-	return strings.Join(queries, "\n")
+	return query.String()
 }
 
 func (builder *Builder) Set(field string, value any) *Builder {
