@@ -10,7 +10,7 @@ import (
 )
 
 type Repository[T any, ID repositories.IComparableID] struct {
-	base          base_repository.Repository
+	base_repository.Repository
 	connection    *sqlx.DB
 	tableName     string
 	fieldList     []string
@@ -30,7 +30,7 @@ func New[T any, ID repositories.IComparableID](
 	fieldList, joinFieldList := type_helper.GetStructFields[T]()
 
 	return Repository[T, ID]{
-		base: base_repository.Repository{},
+		Repository: base_repository.Repository{},
 
 		connection:    connection,
 		tableName:     tableName,
