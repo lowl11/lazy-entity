@@ -12,8 +12,8 @@ func (builder *Builder) Build() string {
 	queries = append(queries, main)
 
 	// where template
-	if len(builder.conditions) > 0 {
-		where := "WHERE " + builder.conditions
+	if builder.conditions.Len() > 0 {
+		where := "WHERE " + builder.conditions.String()
 		queries = append(queries, where)
 	}
 
@@ -26,10 +26,10 @@ func (builder *Builder) Where(conditions ...string) *Builder {
 		conditionArray = append(conditionArray, "\n\t"+item)
 	}
 
-	if builder.conditions == "" {
-		builder.conditions += strings.Join(conditionArray, " AND ")
+	if builder.conditions.Len() == 0 {
+		builder.conditions.WriteString(strings.Join(conditionArray, " AND "))
 	} else {
-		builder.conditions += " AND " + strings.Join(conditionArray, " AND ")
+		builder.conditions.WriteString(" AND " + strings.Join(conditionArray, " AND "))
 	}
 
 	return builder
@@ -40,10 +40,10 @@ func (builder *Builder) WhereOr(conditions ...string) *Builder {
 	for _, item := range conditions {
 		conditionArray = append(conditionArray, "\n\t"+item)
 	}
-	if builder.conditions == "" {
-		builder.conditions += strings.Join(conditionArray, " AND ")
+	if builder.conditions.Len() == 0 {
+		builder.conditions.WriteString(strings.Join(conditionArray, " AND "))
 	} else {
-		builder.conditions += " OR " + strings.Join(conditionArray, " AND ")
+		builder.conditions.WriteString(" OR " + strings.Join(conditionArray, " AND "))
 	}
 
 	return builder
