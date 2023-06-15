@@ -1,7 +1,6 @@
 package update_builder
 
 import (
-	"github.com/lowl11/lazy-entity/internal/helpers/type_helper"
 	"github.com/lowl11/lazy-entity/internal/query_helpers/update_helper"
 	"strings"
 )
@@ -38,7 +37,7 @@ func (builder *Builder) Build() string {
 }
 
 func (builder *Builder) Set(field string, value any) *Builder {
-	builder.setValues = append(builder.setValues, "\t"+field+" = "+type_helper.ToString(value))
+	builder.setValues = append(builder.setValues, update_helper.SetValue(field, value))
 	return builder
 }
 
