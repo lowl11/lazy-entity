@@ -23,8 +23,9 @@ func (builder *Builder) getFields() string {
 
 	tabFieldList := make([]string, 0, len(builder.fieldList))
 	for _, item := range builder.fieldList {
-		tabFieldList = append(tabFieldList, "\n\t"+item)
+		tabFieldList = append(tabFieldList, "\n\t"+builder.getFieldItem(item))
 	}
+
 	return strings.Join(tabFieldList, ", ")
 }
 
@@ -39,10 +40,17 @@ func (builder *Builder) getFieldItem(value string) string {
 		}
 	}
 
+	joinField := strings.Contains(value, ".")
+
 	// check alias name
 	var alias string
-	if len(builder.aliasName) > 0 && !strings.Contains(value, ".") {
+	if len(builder.aliasName) > 0 && !joinField {
 		alias = builder.aliasName + "."
+	}
+
+	// check
+	if joinField {
+		return sql_helper.AliasName(value)
 	}
 
 	return alias + value

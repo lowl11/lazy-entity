@@ -100,3 +100,27 @@ func IsKeyword(word string) bool {
 
 	return false
 }
+
+func AliasName(name string) string {
+	if strings.Contains(name, ".") {
+		before, after, _ := strings.Cut(name, ".")
+		if IsKeyword(before) {
+			return "\"" + before + "\"" + "." + after
+		}
+	}
+
+	if IsKeyword(name) {
+		if strings.Contains(name, ".") {
+			before, after, _ := strings.Cut(name, ".")
+			return "\"" + before + "\"" + "." + after
+		}
+		return "\"" + name + "\""
+	}
+
+	return name
+}
+
+func ConditionAlias(aliasName, conditions string) string {
+	search := aliasName + "."
+	return strings.ReplaceAll(conditions, search, AliasName(aliasName)+".")
+}

@@ -8,6 +8,6 @@ const (
 
 var (
 	keywords = []string{
-		"id", "group",
+		"id", "group", "user",
 	}
 )

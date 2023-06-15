@@ -17,7 +17,8 @@ func (builder *Builder) Build() string {
 	if len(builder.joinList) > 0 {
 		joinQueries := make([]string, 0, len(builder.joinList))
 		for _, item := range builder.joinList {
-			joinQueries = append(joinQueries, "\t"+item.joinType+" JOIN "+item.TableName+" AS "+item.AliasName+" ON ("+item.Conditions+")")
+			joinQueries = append(joinQueries,
+				"\t"+item.joinType+" JOIN "+item.TableName+" AS "+sql_helper.AliasName(item.AliasName)+" ON ("+sql_helper.ConditionAlias(item.AliasName, item.Conditions)+")")
 		}
 		queries = append(queries, strings.Join(joinQueries, "\n"))
 	}
