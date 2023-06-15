@@ -38,3 +38,43 @@ func Join(joinType, tableName, aliasName, condition string) string {
 	join.WriteString(")")
 	return join.String()
 }
+
+func Count(fieldName, expressionValue string) string {
+	count := strings.Builder{}
+	count.Grow(50)
+	count.WriteString("COUNT(")
+	count.WriteString(fieldName)
+	count.WriteString(")")
+	count.WriteString(expressionValue)
+	return count.String()
+}
+
+func Min(fieldName, expressionValue string) string {
+	min := strings.Builder{}
+	min.Grow(50)
+	min.WriteString("MIN(")
+	min.WriteString(fieldName)
+	min.WriteString(")")
+	min.WriteString(expressionValue)
+	return min.String()
+}
+
+func Max(fieldName, expressionValue string) string {
+	max := strings.Builder{}
+	max.Grow(50)
+	max.WriteString("MAX(")
+	max.WriteString(fieldName)
+	max.WriteString(")")
+	max.WriteString(expressionValue)
+	return max.String()
+}
+
+func Avg(fieldName, expressionValue string) string {
+	avg := strings.Builder{}
+	avg.Grow(50)
+	avg.WriteString("AVG(")
+	avg.WriteString(fieldName)
+	avg.WriteString(")")
+	avg.WriteString(expressionValue)
+	return avg.String()
+}

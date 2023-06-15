@@ -165,28 +165,28 @@ func (builder *Builder) Count(field string, value any, expression func(field str
 	fieldName := builder.getFieldItem(field)
 	expressionValue := expression(field, value)
 	expressionValue = strings.ReplaceAll(expressionValue, fieldName, "")
-	return "COUNT(" + fieldName + ")" + expressionValue
+	return select_helper.Count(fieldName, expressionValue)
 }
 
 func (builder *Builder) Min(field string, value any, expression func(field string, value any) string) string {
 	fieldName := builder.getFieldItem(field)
 	expressionValue := expression(field, value)
 	expressionValue = strings.ReplaceAll(expressionValue, fieldName, "")
-	return "MIN(" + fieldName + ")" + expressionValue
+	return select_helper.Min(field, expressionValue)
 }
 
 func (builder *Builder) Max(field string, value any, expression func(field string, value any) string) string {
 	fieldName := builder.getFieldItem(field)
 	expressionValue := expression(field, value)
 	expressionValue = strings.ReplaceAll(expressionValue, fieldName, "")
-	return "MAX(" + fieldName + ")" + expressionValue
+	return select_helper.Max(field, expressionValue)
 }
 
 func (builder *Builder) Avg(field string, value any, expression func(field string, value any) string) string {
 	fieldName := builder.getFieldItem(field)
 	expressionValue := expression(field, value)
 	expressionValue = strings.ReplaceAll(expressionValue, fieldName, "")
-	return "AVG(" + fieldName + ")" + expressionValue
+	return select_helper.Avg(field, expressionValue)
 }
 
 func (builder *Builder) Offset(value int) *Builder {
