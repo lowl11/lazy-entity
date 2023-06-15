@@ -8,6 +8,7 @@ import (
 	"github.com/lowl11/lazy-entity/internal/helpers/type_helper"
 	"github.com/lowl11/lazy-entity/queryapi"
 	"github.com/lowl11/lazy-entity/repo_config"
+	"sync"
 )
 
 func (repo *Repository[T, ID]) Alias(aliasName string) *Repository[T, ID] {
@@ -26,6 +27,12 @@ func (repo *Repository[T, ID]) IdName(name string) *Repository[T, ID] {
 
 func (repo *Repository[T, ID]) Joins(joinList ...repo_config.Join) *Repository[T, ID] {
 	repo.joinList = append(repo.joinList, joinList...)
+	return repo
+}
+
+func (repo *Repository[T, ID]) ThreadSafe() *Repository[T, ID] {
+	repo.threadSafe = true
+	repo.mutex = &sync.Mutex{}
 	return repo
 }
 
@@ -163,6 +170,9 @@ func (repo *Repository[T, ID]) GetItem(customizeFunc func(builder *select_builde
 }
 
 func (repo *Repository[T, ID]) Add(entity T) (ID, error) {
+	repo.lock()
+	defer repo.unlock()
+
 	ctx, cancel := repo.Ctx()
 	defer cancel()
 
@@ -195,6 +205,9 @@ func (repo *Repository[T, ID]) Add(entity T) (ID, error) {
 }
 
 func (repo *Repository[T, ID]) AddWithID(entity T) error {
+	repo.lock()
+	defer repo.unlock()
+
 	ctx, cancel := repo.Ctx()
 	defer cancel()
 
@@ -221,6 +234,9 @@ func (repo *Repository[T, ID]) AddList(entityList []T) error {
 		return nil
 	}
 
+	repo.lock()
+	defer repo.unlock()
+
 	ctx, cancel := repo.Ctx()
 	defer cancel()
 
@@ -246,6 +262,9 @@ func (repo *Repository[T, ID]) AddListWithID(entityList []T) error {
 		return nil
 	}
 
+	repo.lock()
+	defer repo.unlock()
+
 	ctx, cancel := repo.Ctx()
 	defer cancel()
 
@@ -270,6 +289,9 @@ func (repo *Repository[T, ID]) Update(
 	customizeFunc func(builder *update_builder.Builder),
 	entity T,
 ) error {
+	repo.lock()
+	defer repo.unlock()
+
 	ctx, cancel := repo.Ctx()
 	defer cancel()
 
@@ -297,6 +319,9 @@ func (repo *Repository[T, ID]) Update(
 }
 
 func (repo *Repository[T, ID]) Delete(customizeFunc func(builder *delete_builder.Builder), args ...any) error {
+	repo.lock()
+	defer repo.unlock()
+
 	ctx, cancel := repo.Ctx()
 	defer cancel()
 

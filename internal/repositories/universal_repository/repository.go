@@ -7,6 +7,7 @@ import (
 	"github.com/lowl11/lazy-entity/internal/repositories"
 	"github.com/lowl11/lazy-entity/internal/repositories/base_repository"
 	"github.com/lowl11/lazy-entity/repo_config"
+	"sync"
 )
 
 type Repository[T any, ID repositories.IComparableID] struct {
@@ -20,7 +21,10 @@ type Repository[T any, ID repositories.IComparableID] struct {
 	idName    string
 	joinList  []repo_config.Join
 
-	debug bool
+	threadSafe bool
+	debug      bool
+
+	mutex *sync.Mutex
 }
 
 func New[T any, ID repositories.IComparableID](

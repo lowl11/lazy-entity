@@ -48,3 +48,19 @@ func (repo *Repository[T, ID]) getNonEmptyFields(okayIndices []int) []string {
 	}
 	return fieldList
 }
+
+func (repo *Repository[T, ID]) lock() {
+	if !repo.threadSafe {
+		return
+	}
+
+	repo.mutex.Lock()
+}
+
+func (repo *Repository[T, ID]) unlock() {
+	if !repo.threadSafe {
+		return
+	}
+
+	repo.mutex.Unlock()
+}

@@ -30,5 +30,9 @@ func NewCrud[T any, ID repositories.IComparableID](connection *sqlx.DB, tableNam
 		newRepo.Debug()
 	}
 
+	if config.ThreadSafe {
+		newRepo.ThreadSafe()
+	}
+
 	return newRepo
 }

@@ -5,5 +5,6 @@ type Crud struct {
 	IdName    string
 	Joins     []Join
 
-	Debug bool
+	ThreadSafe bool
+	Debug      bool
 }
