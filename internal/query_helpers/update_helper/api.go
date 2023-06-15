@@ -16,7 +16,7 @@ func VariableField(name string) string {
 
 func SetValue(field string, value any) string {
 	valueBuilder := strings.Builder{}
-	//field.Grow()
+	valueBuilder.Grow(50)
 	valueBuilder.WriteString("\t")
 	valueBuilder.WriteString(field)
 	valueBuilder.WriteString(" = ")
