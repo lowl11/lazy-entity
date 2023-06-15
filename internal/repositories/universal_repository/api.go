@@ -38,22 +38,23 @@ func (repo *Repository[T, ID]) Debug() *Repository[T, ID] {
 	return repo
 }
 
-func (repo *Repository[T, ID]) ExistByID(id ID) (bool, error) {
+func (repo *Repository[T, ID]) Exist(customizeFunc func(builder *select_builder.Builder), args ...any) (bool, error) {
 	ctx, cancel := repo.base.Ctx()
 	defer cancel()
 
 	builder := queryapi.Select()
-	query := builder.
+	builder.
 		Fields(repo.idName).
-		From(repo.tableName).
-		Where(builder.Equal(repo.idName, "$1")).
-		Build()
+		From(repo.tableName)
 
+	customizeFunc(builder)
+
+	query := builder.Build()
 	if repo.debug {
 		fmt.Println(query)
 	}
 
-	rows, err := repo.connection.QueryxContext(ctx, query, id)
+	rows, err := repo.connection.QueryxContext(ctx, query, args...)
 	if err != nil {
 		return false, err
 	}

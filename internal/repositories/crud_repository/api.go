@@ -8,6 +8,12 @@ import (
 	"github.com/lowl11/lazy-entity/order_types"
 )
 
+func (repo *Repository[T, ID]) ExistByID(id ID) (bool, error) {
+	return repo.Exist(func(builder *select_builder.Builder) {
+		builder.Where(builder.Equal(repo.GetIdName(), "$1"))
+	}, id)
+}
+
 func (repo *Repository[T, ID]) GetAll() ([]T, error) {
 	return repo.GetList(func(builder *select_builder.Builder) {})
 }

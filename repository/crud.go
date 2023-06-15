@@ -10,6 +10,8 @@ import (
 type ICrudRepository[T any, ID repositories.IComparableID] interface {
 	IUniversalRepository[T, ID]
 
+	ExistByID(id ID) (bool, error)
+
 	GetAll() ([]T, error)
 	GetByID(id ID) (*T, error)
 	GetByIdList(id []ID) ([]T, error)
