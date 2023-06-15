@@ -35,7 +35,7 @@ func (builder *Builder) Build() string {
 		for _, item := range builder.orderFields {
 			orderQueries = append(orderQueries, builder.getFieldItem(item))
 		}
-		queries = append(queries, "ORDER BY "+strings.Join(orderQueries, ", ")+" "+builder.orderType)
+		queries = append(queries, select_helper.OrderBy(builder.orderType, strings.Join(orderQueries, ", ")))
 	}
 
 	// group by template
