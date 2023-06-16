@@ -9,11 +9,10 @@ import (
 type Builder struct {
 	condition_builder.Builder
 
-	fieldList []string
-	tableName string
-	aliasName string
-	joinList  []joinModel
-	//conditions       string
+	fieldList        []string
+	tableName        string
+	aliasName        string
+	joinList         []joinModel
 	conditions       *strings.Builder
 	orderFields      []string
 	orderType        string

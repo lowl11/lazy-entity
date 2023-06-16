@@ -8,29 +8,28 @@ import (
 )
 
 func (builder *Builder) Build() string {
-	queries := make([]string, 0, 10)
+	query := strings.Builder{}
+	//query.Grow() // todo: implement me
 
 	// main template
-	queries = append(queries, select_helper.Main(builder.getTableName(), builder.getFields()))
+	select_helper.Main(&query, builder.getTableName(), builder.getFields())
 
 	// join template
-	if len(builder.joinList) > 0 {
-		joinQueries := make([]string, 0, len(builder.joinList))
-		for _, item := range builder.joinList {
-			joinQueries = append(joinQueries, select_helper.Join(
-				item.joinType,
-				item.TableName,
-				sql_helper.AliasName(item.AliasName),
-				sql_helper.ConditionAlias(item.AliasName, item.Conditions),
-			))
-		}
-		queries = append(queries, strings.Join(joinQueries, "\n"))
+	for _, item := range builder.joinList {
+		select_helper.Join(
+			&query,
+			item.joinType,
+			item.TableName,
+			sql_helper.AliasName(item.AliasName),
+			sql_helper.ConditionAlias(item.AliasName, item.Conditions),
+		)
 	}
 
 	// where template
 	if builder.conditions.Len() > 0 {
-		where := "WHERE " + builder.conditions.String()
-		queries = append(queries, where)
+		query.WriteString("WHERE ")
+		query.WriteString(builder.conditions.String())
+		query.WriteString("\n")
 	}
 
 	// order by template
@@ -39,7 +38,8 @@ func (builder *Builder) Build() string {
 		for _, item := range builder.orderFields {
 			orderQueries = append(orderQueries, builder.getFieldItem(item))
 		}
-		queries = append(queries, select_helper.OrderBy(builder.orderType, strings.Join(orderQueries, ", ")))
+
+		select_helper.OrderBy(&query, builder.orderType, strings.Join(orderQueries, ", "))
 	}
 
 	// group by template
@@ -48,27 +48,26 @@ func (builder *Builder) Build() string {
 		for _, item := range builder.groupByFields {
 			groupQueries = append(groupQueries, builder.getFieldItem(item))
 		}
-		queries = append(queries, "GROUP BY "+strings.Join(groupQueries, ", "))
+
+		select_helper.GroupBy(&query, strings.Join(groupQueries, ", "))
 	}
 
 	// having template
-	if builder.havingExpression != "" {
-		queries = append(queries, "HAVING "+builder.havingExpression)
-	}
+	select_helper.Having(&query, builder.havingExpression)
 
 	// offset template
-	offset := builder.getOffset()
-	if offset != "" {
-		queries = append(queries, offset)
+	if offset := builder.getOffset(); offset != "" {
+		query.WriteString(offset)
+		query.WriteString("\n")
 	}
 
 	// limit template
-	limit := builder.getLimit()
-	if limit != "" {
-		queries = append(queries, limit)
+	if limit := builder.getLimit(); limit != "" {
+		query.WriteString(limit)
+		query.WriteString("\n")
 	}
 
-	return strings.Join(queries, "\n")
+	return query.String()
 }
 
 func (builder *Builder) Fields(fieldList ...string) *Builder {

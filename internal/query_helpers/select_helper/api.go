@@ -4,39 +4,49 @@ import (
 	"strings"
 )
 
-func Main(tableName, fields string) string {
-	main := strings.Builder{}
-	main.Grow(500)
-	main.WriteString("SELECT ")
-	main.WriteString(fields)
-	main.WriteString("\nFROM ")
-	main.WriteString(tableName)
-	return main.String()
+func Main(query *strings.Builder, tableName, fields string) {
+	query.WriteString("SELECT ")
+	query.WriteString(fields)
+	query.WriteString("\nFROM ")
+	query.WriteString(tableName)
+	query.WriteString("\n")
 }
 
-func OrderBy(orderType, orderQueries string) string {
-	orderBy := strings.Builder{}
-	orderBy.Grow(30)
-	orderBy.WriteString("ORDER BY ")
-	orderBy.WriteString(orderQueries)
-	orderBy.WriteString(" ")
-	orderBy.WriteString(orderType)
-	return orderBy.String()
+func OrderBy(query *strings.Builder, orderType, orderQueries string) {
+	query.WriteString("ORDER BY ")
+	query.WriteString(orderQueries)
+	query.WriteString(" ")
+	query.WriteString(orderType)
+	query.WriteString("\n")
 }
 
-func Join(joinType, tableName, aliasName, condition string) string {
-	join := strings.Builder{}
-	join.Grow(100)
-	join.WriteString("\t")
-	join.WriteString(joinType)
-	join.WriteString(" JOIN ")
-	join.WriteString(tableName)
-	join.WriteString(" AS ")
-	join.WriteString(aliasName)
-	join.WriteString(" ON (")
-	join.WriteString(condition)
-	join.WriteString(")")
-	return join.String()
+func GroupBy(query *strings.Builder, groupQueries string) {
+	query.WriteString("GROUP BY ")
+	query.WriteString(groupQueries)
+	query.WriteString("\n")
+}
+
+func Having(query *strings.Builder, expression string) {
+	if expression == "" {
+		return
+	}
+
+	query.WriteString("HAVING ")
+	query.WriteString(expression)
+	query.WriteString("\n")
+}
+
+func Join(query *strings.Builder, joinType, tableName, aliasName, condition string) {
+	query.WriteString("\t")
+	query.WriteString(joinType)
+	query.WriteString(" JOIN ")
+	query.WriteString(tableName)
+	query.WriteString(" AS ")
+	query.WriteString(aliasName)
+	query.WriteString(" ON (")
+	query.WriteString(condition)
+	query.WriteString(")")
+	query.WriteString("\n")
 }
 
 func Count(fieldName, expressionValue string) string {
