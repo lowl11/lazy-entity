@@ -1,43 +1,54 @@
 # lazy-entity
 
-> SQL builder & mini-ORM library<br>
-> mini-ORM - creating simple repositories which are based on SQL builder
+## SQL builder & mini-ORM library
+**builder** - building SQL queries<br>
+**mini-ORM** - creating simple repositories which are based on SQL builder
 
-## SQL Builder
-<hr>
+### SQL Builder
 
+- SELECT - queryapi.Select()
+- INSERT - queryapi.Insert()
+- UPDATE - queryapi.Update()
+- DELETE - queryapi.Delete()
+
+### Repositories
+
+- IRepository - repository.NewBase()
+- ICrudRepository - repository.NewCrud\[<entity_type>, <id_type>\]()
+
+## SQL Builder Examples
 ### SELECT
 Go
 ```go
 builder := queryapi.Select()
-	builder.
-		Fields("id", "full_name", "phone", "is_resident", "contact.id", "COUNT(id)").
-		From("users").
-		Alias("user").
-		Join("contacts", "contact", builder.And(builder.Equal("phone", "$contact.phone"))).
-		Where(
-			builder.And(
-				builder.Or(
-					builder.Equal("phone", "+77474858669"),
-					builder.ILike("full_name", "%ussayev%"),
-				),
-				builder.Like("full_name", "%Ussayev%"),
-				builder.Equal("id", ":id"),
-			),
-			builder.Or(
-				builder.Equal("is_resident", 1),
-				builder.Equal("is_resident", 0),
-			),
-			builder.Gte("id", 25),
-		).
-		OrderBy(order_types.Desc, "phone").
-		Having(builder.Count("id", 25, builder.Lte)).
-		GroupBy("id").
-		Offset(50).
-		Limit(10)
+builder.
+    Fields("id", "full_name", "phone", "is_resident", "contact.id", "COUNT(id)").
+    From("users").
+    Alias("user").
+    Join("contacts", "contact", builder.And(builder.Equal("phone", "$contact.phone"))).
+    Where(
+        builder.And(
+            builder.Or(
+                builder.Equal("phone", "+77474858669"),
+                builder.ILike("full_name", "%ussayev%"),
+            ),
+            builder.Like("full_name", "%Ussayev%"),
+            builder.Equal("id", ":id"),
+        ),
+        builder.Or(
+            builder.Equal("is_resident", 1),
+            builder.Equal("is_resident", 0),
+        ),
+        builder.Gte("id", 25),
+    ).
+    OrderBy(order_types.Desc, "phone").
+    Having(builder.Count("id", 25, builder.Lte)).
+    GroupBy("id").
+    Offset(50).
+    Limit(10)
 
-	fmt.Println("query:")
-	fmt.Println(builder.Build())
+fmt.Println("query:")
+fmt.Println(builder.Build())
 ```
 
 SQL
@@ -125,32 +136,25 @@ WHERE
         (id = 5 OR id > 10)
 ```
 
-## mini-ORM
+## mini-ORM examples
 <hr>
 
 Create Crud-Repository
 ```go
-repository.NewCrud[Entity, int](connection, "contacts", "contact")
-```
+contactRepo := repository.NewCrud[Entity, int](
+	connection, // *sqlx.Conn
+	"contacts", // table name
+	repo_config.Crud{ // config for ICrudRepository
+	    Alias: "contact",
+    },
+)
 
-Methods
-```go
-Count() (int, error)
-ExistByID(id ID) (bool, error)
+list, err := contactRepo.GetAll()
+if err != nil {
+	log.Fatal(err)
+}
 
-GetAll() ([]T, error)
-GetByID(id ID) (*T, error)
-GetByIdList(id []ID) ([]T, error)
-
-Add(entity any) (ID, error)
-AddList(entityList []any) error
-
-UpdateByID(id ID, updateEntity any) error
-UpdateByCondition(
-    conditionFunc func(builder *update_builder.Builder) string,
-    updateEntity any,
-) error
-
-DeleteAll() error
-DeleteByID(id ID) error
+for _, item := range list {
+	fmt.Println(list)
+}
 ```
