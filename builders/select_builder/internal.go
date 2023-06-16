@@ -13,20 +13,24 @@ func (builder *Builder) getFields() string {
 	}
 
 	if len(builder.aliasName) > 0 {
-		aliasedFields := make([]string, 0, len(builder.fieldList))
+		alias := strings.Builder{}
 		for _, item := range builder.fieldList {
-			aliasedFields = append(aliasedFields, "\n\t"+builder.getFieldItem(item))
+			alias.WriteString("\n\t")
+			alias.WriteString(builder.getFieldItem(item))
+			alias.WriteString(",")
 		}
 
-		return strings.Join(aliasedFields, ",")
+		return alias.String()[:alias.Len()-1]
 	}
 
-	tabFieldList := make([]string, 0, len(builder.fieldList))
+	tab := strings.Builder{}
 	for _, item := range builder.fieldList {
-		tabFieldList = append(tabFieldList, "\n\t"+builder.getFieldItem(item))
+		tab.WriteString("\n\t")
+		tab.WriteString(builder.getFieldItem(item))
+		tab.WriteString(", ")
 	}
 
-	return strings.Join(tabFieldList, ", ")
+	return tab.String()[:tab.Len()-2]
 }
 
 func (builder *Builder) getFieldItem(value string) string {
