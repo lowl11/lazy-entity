@@ -51,7 +51,7 @@ func Join(query *strings.Builder, joinType, tableName, aliasName, condition stri
 
 func Count(fieldName, expressionValue string) string {
 	count := strings.Builder{}
-	count.Grow(50)
+	count.Grow(len(fieldName) + len(expressionValue))
 	count.WriteString("COUNT(")
 	count.WriteString(fieldName)
 	count.WriteString(")")
@@ -61,7 +61,7 @@ func Count(fieldName, expressionValue string) string {
 
 func Min(fieldName, expressionValue string) string {
 	min := strings.Builder{}
-	min.Grow(50)
+	min.Grow(len(fieldName) + len(expressionValue))
 	min.WriteString("MIN(")
 	min.WriteString(fieldName)
 	min.WriteString(")")
@@ -71,7 +71,7 @@ func Min(fieldName, expressionValue string) string {
 
 func Max(fieldName, expressionValue string) string {
 	max := strings.Builder{}
-	max.Grow(50)
+	max.Grow(len(fieldName) + len(expressionValue))
 	max.WriteString("MAX(")
 	max.WriteString(fieldName)
 	max.WriteString(")")
@@ -81,7 +81,7 @@ func Max(fieldName, expressionValue string) string {
 
 func Avg(fieldName, expressionValue string) string {
 	avg := strings.Builder{}
-	avg.Grow(50)
+	avg.Grow(len(fieldName) + len(expressionValue))
 	avg.WriteString("AVG(")
 	avg.WriteString(fieldName)
 	avg.WriteString(")")
