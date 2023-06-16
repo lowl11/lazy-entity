@@ -1,9 +1,9 @@
 package select_builder
 
 import (
+	"github.com/lowl11/lazy-entity/enums/join_types"
 	"github.com/lowl11/lazy-entity/internal/helpers/sql_helper"
 	"github.com/lowl11/lazy-entity/internal/query_helpers/select_helper"
-	"github.com/lowl11/lazy-entity/join_types"
 	"strings"
 )
 

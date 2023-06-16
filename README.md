@@ -1,6 +1,4 @@
-# lazy-entity
-
-## SQL builder & mini-ORM library
+# lazy-entity - SQL builder & mini-ORM library
 **builder** - building SQL queries<br>
 **mini-ORM** - creating simple repositories which are based on SQL builder
 

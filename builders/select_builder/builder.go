@@ -2,8 +2,8 @@ package select_builder
 
 import (
 	"github.com/lowl11/lazy-entity/builders/condition_builder"
+	"github.com/lowl11/lazy-entity/enums/order_types"
 	"github.com/lowl11/lazy-entity/internal/services/grow_select_service"
-	"github.com/lowl11/lazy-entity/order_types"
 	"strings"
 )
 

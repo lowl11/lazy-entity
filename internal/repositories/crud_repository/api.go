@@ -5,7 +5,7 @@ import (
 	"github.com/lowl11/lazy-entity/builders/delete_builder"
 	"github.com/lowl11/lazy-entity/builders/select_builder"
 	"github.com/lowl11/lazy-entity/builders/update_builder"
-	"github.com/lowl11/lazy-entity/order_types"
+	"github.com/lowl11/lazy-entity/enums/order_types"
 )
 
 func (repo *Repository[T, ID]) ExistByID(id ID) (bool, error) {
