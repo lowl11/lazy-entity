@@ -61,11 +61,16 @@ func (builder *Builder) getFieldItem(value string) string {
 }
 
 func (builder *Builder) getTableName() string {
-	var alias string
+	tableName := strings.Builder{}
 	if len(builder.aliasName) > 0 {
-		alias = " AS " + builder.aliasName
+		tableName.WriteString(builder.tableName)
+		tableName.WriteString(" AS ")
+		tableName.WriteString(builder.aliasName)
+	} else {
+		tableName.WriteString(builder.tableName)
 	}
-	return builder.tableName + alias
+
+	return tableName.String()
 }
 
 func (builder *Builder) getOffset() string {

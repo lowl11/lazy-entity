@@ -6,6 +6,7 @@ import (
 	"github.com/lowl11/lazy-entity/internal/join_field"
 	"reflect"
 	"strconv"
+	"strings"
 )
 
 func ToString(anyValue any) string {
@@ -34,7 +35,11 @@ func ToString(anyValue any) string {
 			return stringValue[1:]
 		}
 
-		return "'" + stringValue + "'"
+		valueString := strings.Builder{}
+		valueString.WriteString("'")
+		valueString.WriteString(stringValue)
+		valueString.WriteString("'")
+		return valueString.String()
 	case reflect.Bool:
 		return strconv.FormatBool(anyValue.(bool))
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
