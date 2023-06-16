@@ -9,7 +9,7 @@ import (
 
 func (builder *Builder) Build() string {
 	query := strings.Builder{}
-	//query.Grow() // todo: implement me
+	query.Grow(builder.growService.Get())
 
 	// main template
 	select_helper.Main(&query, builder.getTableName(), builder.getFields())
@@ -72,16 +72,19 @@ func (builder *Builder) Build() string {
 
 func (builder *Builder) Fields(fieldList ...string) *Builder {
 	builder.fieldList = append(builder.fieldList, fieldList...)
+	builder.growService.Fields(len(fieldList))
 	return builder
 }
 
 func (builder *Builder) From(tableName string) *Builder {
 	builder.tableName = tableName
+	builder.growService.Table(&builder.tableName)
 	return builder
 }
 
 func (builder *Builder) Alias(aliasName string) *Builder {
 	builder.aliasName = sql_helper.AliasName(aliasName)
+	builder.growService.Alias(&builder.aliasName)
 	return builder
 }
 
@@ -92,6 +95,7 @@ func (builder *Builder) Join(tableName, aliasName, conditions string) *Builder {
 		Conditions: conditions,
 		joinType:   join_types.Inner,
 	})
+	builder.growService.Join(tableName, aliasName, conditions)
 	return builder
 }
 
@@ -102,6 +106,7 @@ func (builder *Builder) LeftJoin(tableName, aliasName, conditions string) *Build
 		Conditions: conditions,
 		joinType:   join_types.Left,
 	})
+	builder.growService.LeftJoin(tableName, aliasName, conditions)
 	return builder
 }
 
@@ -112,6 +117,7 @@ func (builder *Builder) RightJoin(tableName, aliasName, conditions string) *Buil
 		Conditions: conditions,
 		joinType:   join_types.Right,
 	})
+	builder.growService.RightJoin(tableName, aliasName, conditions)
 	return builder
 }
 
@@ -121,11 +127,17 @@ func (builder *Builder) Where(conditions ...string) *Builder {
 		conditionArray = append(conditionArray, "\n\t"+item)
 	}
 
+	var query string
+
 	if builder.conditions.Len() == 0 {
-		builder.conditions.WriteString(strings.Join(conditionArray, " AND "))
+		query = strings.Join(conditionArray, " AND ")
+		builder.conditions.WriteString(query)
 	} else {
-		builder.conditions.WriteString(" AND " + strings.Join(conditionArray, " AND "))
+		query = " AND " + strings.Join(conditionArray, " AND ")
+		builder.conditions.WriteString(query)
 	}
+
+	builder.growService.Where(query)
 
 	return builder
 }
@@ -135,11 +147,17 @@ func (builder *Builder) WhereOr(conditions ...string) *Builder {
 	for _, item := range conditions {
 		conditionArray = append(conditionArray, "\n\t"+item)
 	}
+
+	var query string
 	if builder.conditions.Len() == 0 {
-		builder.conditions.WriteString(strings.Join(conditionArray, " AND "))
+		query = strings.Join(conditionArray, " AND ")
+		builder.conditions.WriteString(query)
 	} else {
-		builder.conditions.WriteString(" OR " + strings.Join(conditionArray, " AND "))
+		query = " OR " + strings.Join(conditionArray, " AND ")
+		builder.conditions.WriteString(query)
 	}
+
+	builder.growService.Where(query)
 
 	return builder
 }
@@ -147,16 +165,19 @@ func (builder *Builder) WhereOr(conditions ...string) *Builder {
 func (builder *Builder) OrderBy(orderType string, fieldList ...string) *Builder {
 	builder.orderType = orderType
 	builder.orderFields = fieldList
+	builder.growService.OrderBy(len(fieldList))
 	return builder
 }
 
 func (builder *Builder) Having(expression string) *Builder {
 	builder.havingExpression = expression
+	builder.growService.Having()
 	return builder
 }
 
 func (builder *Builder) GroupBy(fields ...string) *Builder {
 	builder.groupByFields = append(builder.groupByFields, fields...)
+	builder.growService.GroupBy(len(fields))
 	return builder
 }
 
@@ -190,10 +211,12 @@ func (builder *Builder) Avg(field string, value any, expression func(field strin
 
 func (builder *Builder) Offset(value int) *Builder {
 	builder.offset = value
+	builder.growService.Offset()
 	return builder
 }
 
 func (builder *Builder) Limit(value int) *Builder {
 	builder.limit = value
+	builder.growService.Limit()
 	return builder
 }

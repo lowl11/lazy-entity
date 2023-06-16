@@ -18,7 +18,7 @@ func (builder *Builder) getFields() string {
 			aliasedFields = append(aliasedFields, "\n\t"+builder.getFieldItem(item))
 		}
 
-		return strings.Join(aliasedFields, ", ")
+		return strings.Join(aliasedFields, ",")
 	}
 
 	tabFieldList := make([]string, 0, len(builder.fieldList))
