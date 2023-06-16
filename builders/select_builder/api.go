@@ -34,22 +34,24 @@ func (builder *Builder) Build() string {
 
 	// order by template
 	if len(builder.orderFields) > 0 {
-		orderQueries := make([]string, 0, len(builder.orderFields))
+		orderQueries := strings.Builder{}
 		for _, item := range builder.orderFields {
-			orderQueries = append(orderQueries, builder.getFieldItem(item))
+			orderQueries.WriteString(builder.getFieldItem(item))
+			orderQueries.WriteString(", ")
 		}
 
-		select_helper.OrderBy(&query, builder.orderType, strings.Join(orderQueries, ", "))
+		select_helper.OrderBy(&query, builder.orderType, orderQueries.String()[:orderQueries.Len()-2])
 	}
 
 	// group by template
 	if len(builder.groupByFields) > 0 {
-		groupQueries := make([]string, 0, len(builder.groupByFields))
+		groupQueries := strings.Builder{}
 		for _, item := range builder.groupByFields {
-			groupQueries = append(groupQueries, builder.getFieldItem(item))
+			groupQueries.WriteString(builder.getFieldItem(item))
+			groupQueries.WriteString(", ")
 		}
 
-		select_helper.GroupBy(&query, strings.Join(groupQueries, ", "))
+		select_helper.GroupBy(&query, groupQueries.String()[:groupQueries.Len()-2])
 	}
 
 	// having template
@@ -122,43 +124,40 @@ func (builder *Builder) RightJoin(tableName, aliasName, conditions string) *Buil
 }
 
 func (builder *Builder) Where(conditions ...string) *Builder {
-	conditionArray := make([]string, 0, len(conditions))
+	conditionArray := strings.Builder{}
+
+	if builder.conditions.Len() != 0 {
+		conditionArray.WriteString(" AND ")
+	}
+
 	for _, item := range conditions {
-		conditionArray = append(conditionArray, "\n\t"+item)
+		conditionArray.WriteString("\n\t")
+		conditionArray.WriteString(item)
+		conditionArray.WriteString(" AND ")
 	}
 
-	var query string
-
-	if builder.conditions.Len() == 0 {
-		query = strings.Join(conditionArray, " AND ")
-		builder.conditions.WriteString(query)
-	} else {
-		query = " AND " + strings.Join(conditionArray, " AND ")
-		builder.conditions.WriteString(query)
-	}
-
+	query := conditionArray.String()[:conditionArray.Len()-5]
+	builder.conditions.WriteString(query)
 	builder.growService.Where(query)
-
 	return builder
 }
 
 func (builder *Builder) WhereOr(conditions ...string) *Builder {
-	conditionArray := make([]string, 0, len(conditions))
+	conditionArray := strings.Builder{}
+
+	if builder.conditions.Len() != 0 {
+		conditionArray.WriteString(" OR ")
+	}
+
 	for _, item := range conditions {
-		conditionArray = append(conditionArray, "\n\t"+item)
+		conditionArray.WriteString("\n\t")
+		conditionArray.WriteString(item)
+		conditionArray.WriteString(" AND ")
 	}
 
-	var query string
-	if builder.conditions.Len() == 0 {
-		query = strings.Join(conditionArray, " AND ")
-		builder.conditions.WriteString(query)
-	} else {
-		query = " OR " + strings.Join(conditionArray, " AND ")
-		builder.conditions.WriteString(query)
-	}
-
+	query := conditionArray.String()[:conditionArray.Len()-5]
+	builder.conditions.WriteString(query)
 	builder.growService.Where(query)
-
 	return builder
 }
 
