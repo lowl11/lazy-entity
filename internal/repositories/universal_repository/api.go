@@ -12,6 +12,10 @@ import (
 	"sync"
 )
 
+func (repo *Repository[T, ID]) Guid() string {
+	return repo.Repository.Guid()
+}
+
 func (repo *Repository[T, ID]) Alias(aliasName string) *Repository[T, ID] {
 	repo.aliasName = aliasName
 	return repo

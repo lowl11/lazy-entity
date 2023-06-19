@@ -9,6 +9,8 @@ import (
 )
 
 type IUniversalRepository[T any, ID repositories.IComparableID] interface {
+	Guid() string
+
 	Count() (int, error)
 	Exist(customizeFunc func(builder *select_builder.Builder), args ...any) (bool, error)
 
