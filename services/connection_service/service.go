@@ -1,4 +1,4 @@
-package database_service
+package connection_service
 
 import "github.com/jmoiron/sqlx"
 
