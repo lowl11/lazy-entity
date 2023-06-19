@@ -31,11 +31,19 @@ func (service *Service) ScriptPath(path string) *Service {
 
 // GetStartScript get script from folder /resources/scripts/start/<script_file>.sql
 func (service *Service) GetStartScript(script string) string {
+	if service.startScripts == nil || len(service.startScripts) == 0 {
+		return ""
+	}
+
 	return service.startScripts[script+".sql"]
 }
 
 // GetScript get script from folder /resources/script/<folder>/<script_file>.sql
 func (service *Service) GetScript(folder, script string) string {
+	if service.scripts == nil || len(service.scripts) == 0 {
+		return ""
+	}
+
 	// remove .sql
 	script = strings.ReplaceAll(script, ".sql", "")
 

@@ -2,7 +2,7 @@ package repository
 
 import (
 	"github.com/lowl11/lazy-entity/internal/repositories/script_repository"
-	"github.com/lowl11/lazy-entity/services/script_service"
+	"github.com/lowl11/lazy-entity/internal/services/script_service"
 )
 
 // IScriptRepository read .sql scripts from "resources" folder
