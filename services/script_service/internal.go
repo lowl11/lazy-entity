@@ -1,13 +1,21 @@
 package script_service
 
-import "github.com/lowl11/lazyfile/folderapi"
+import (
+	"github.com/lowl11/lazyfile/folderapi"
+)
 
-func (event *Service) readStartScripts() error {
-	if !folderapi.Exist("resources/scripts/start") {
+const (
+	defaultResourcesPath = "resources"
+	defaultScriptsPath   = defaultResourcesPath + "/scripts"
+	defaultStartPath     = defaultResourcesPath + "/scripts/start"
+)
+
+func (service *Service) readStartScripts() error {
+	if !folderapi.Exist(service.startPath) {
 		return nil
 	}
 
-	files, err := folderapi.Objects("resources/scripts/start")
+	files, err := folderapi.Objects(service.startPath)
 	if err != nil {
 		return err
 	}
@@ -22,18 +30,18 @@ func (event *Service) readStartScripts() error {
 			return err
 		}
 
-		event.startScripts[file.Name] = string(body)
+		service.startScripts[file.Name] = string(body)
 	}
 
 	return nil
 }
 
-func (event *Service) readScripts() error {
-	if !folderapi.Exist("resources/scripts") {
+func (service *Service) readScripts() error {
+	if !folderapi.Exist(service.scriptsPath) {
 		return nil
 	}
 
-	folders, err := folderapi.Objects("resources/scripts/")
+	folders, err := folderapi.Objects(service.scriptsPath)
 	if err != nil {
 		return err
 	}
@@ -45,7 +53,7 @@ func (event *Service) readScripts() error {
 
 		folderMap := make(map[string]string)
 
-		files, err := folderapi.Objects("resources/scripts/" + folder.Name)
+		files, err := folderapi.Objects(service.scriptsPath + "/" + folder.Name)
 		if err != nil {
 			return err
 		}
@@ -59,7 +67,7 @@ func (event *Service) readScripts() error {
 			folderMap[file.Name] = string(body)
 		}
 
-		event.scripts[folder.Name] = folderMap
+		service.scripts[folder.Name] = folderMap
 	}
 
 	return nil

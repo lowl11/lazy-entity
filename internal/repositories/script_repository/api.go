@@ -1,35 +1,21 @@
 package script_repository
 
-import (
-	"context"
-	"github.com/jmoiron/sqlx"
-	"time"
-)
-
-func (repo *Repository) Script(folder, script string) string {
-	return repo.script.GetScript(folder, script)
+func (repo *Repository) Read() error {
+	return repo.scriptService.Read()
 }
 
-func (repo *Repository) StartScript(script string) string {
-	return repo.script.GetStartScript(script)
+func (repo *Repository) Get(folder, name string) string {
+	return repo.scriptService.GetScript(folder, name)
 }
 
-func (repo *Repository) Guid() string {
-	return repo.base.Guid()
+func (repo *Repository) Start(name string) string {
+	return repo.scriptService.GetStartScript(name)
 }
 
-func (repo *Repository) Ctx(customTimeout ...time.Duration) (context.Context, func()) {
-	return repo.base.Ctx(customTimeout...)
+func (repo *Repository) StartPath(path string) {
+	repo.scriptService.StartPath(path)
 }
 
-func (repo *Repository) CloseRows(rows *sqlx.Rows) {
-	repo.base.CloseRows(rows)
-}
-
-func (repo *Repository) Rollback(transaction *sqlx.Tx) {
-	repo.base.Rollback(transaction)
-}
-
-func (repo *Repository) Transaction(connection *sqlx.DB, transactionActions func(tx *sqlx.Tx) error) error {
-	return repo.base.Transaction(connection, transactionActions)
+func (repo *Repository) ScriptPath(path string) {
+	repo.scriptService.ScriptPath(path)
 }
