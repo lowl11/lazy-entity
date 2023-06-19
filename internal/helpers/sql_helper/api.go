@@ -3,7 +3,6 @@ package sql_helper
 import (
 	"context"
 	"github.com/jmoiron/sqlx"
-	"log"
 	"strings"
 	"time"
 
@@ -49,46 +48,6 @@ func Connection(connectionString string, maxConnections, maxLifetime int, timeou
 	connection.SetConnMaxIdleTime(time.Duration(maxLifetime) * time.Minute)
 
 	return connection, nil
-}
-
-func CloseRows(rows *sqlx.Rows) {
-	if err := rows.Close(); err != nil {
-		log.Println(err)
-	}
-}
-
-func Rollback(transaction *sqlx.Tx) {
-	if err := transaction.Rollback(); err != nil {
-		if !strings.Contains(err.Error(), "sql: transaction has already been committed or rolled back") {
-			log.Println(err, "Rollback transaction error")
-		}
-	}
-}
-
-func Transaction(connection *sqlx.DB, transactionActions func(tx *sqlx.Tx) error) error {
-	transaction, err := connection.Beginx()
-	if err != nil {
-		return err
-	}
-	defer Rollback(transaction)
-
-	if err = transactionActions(transaction); err != nil {
-		return err
-	}
-
-	if err = transaction.Commit(); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func Ctx(customTimeout ...time.Duration) (context.Context, func()) {
-	defaultTimeout := time.Second * 5
-	if len(customTimeout) > 0 {
-		defaultTimeout = customTimeout[0]
-	}
-	return context.WithTimeout(context.Background(), defaultTimeout)
 }
 
 func IsKeyword(word string) bool {

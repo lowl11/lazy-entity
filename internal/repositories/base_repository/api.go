@@ -4,7 +4,8 @@ import (
 	"context"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
-	"github.com/lowl11/lazy-entity/internal/helpers/sql_helper"
+	"log"
+	"strings"
 	"time"
 )
 
@@ -13,17 +14,44 @@ func (repo *Repository) Guid() string {
 }
 
 func (repo *Repository) Ctx(customTimeout ...time.Duration) (context.Context, func()) {
-	return sql_helper.Ctx(customTimeout...)
+	defaultTimeout := time.Second * 5
+	if len(customTimeout) > 0 {
+		defaultTimeout = customTimeout[0]
+	}
+	return context.WithTimeout(context.Background(), defaultTimeout)
 }
 
 func (repo *Repository) CloseRows(rows *sqlx.Rows) {
-	sql_helper.CloseRows(rows)
+	if err := rows.Close(); err != nil {
+		log.Println(err)
+	}
 }
 
 func (repo *Repository) Rollback(transaction *sqlx.Tx) {
-	sql_helper.Rollback(transaction)
+	if err := transaction.Rollback(); err != nil {
+		if !strings.Contains(
+			err.Error(),
+			"sql: transaction has already been committed or rolled back",
+		) {
+			log.Println(err, "Rollback transaction error")
+		}
+	}
 }
 
 func (repo *Repository) Transaction(connection *sqlx.DB, transactionActions func(tx *sqlx.Tx) error) error {
-	return sql_helper.Transaction(connection, transactionActions)
+	transaction, err := connection.Beginx()
+	if err != nil {
+		return err
+	}
+	defer repo.Rollback(transaction)
+
+	if err = transactionActions(transaction); err != nil {
+		return err
+	}
+
+	if err = transaction.Commit(); err != nil {
+		return err
+	}
+
+	return nil
 }
