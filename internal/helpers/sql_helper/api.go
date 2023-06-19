@@ -3,6 +3,7 @@ package sql_helper
 import (
 	"context"
 	"github.com/jmoiron/sqlx"
+	"log"
 	"strings"
 	"time"
 
@@ -82,4 +83,15 @@ func AliasName(name string) string {
 func ConditionAlias(aliasName, conditions string) string {
 	search := aliasName + "."
 	return strings.ReplaceAll(conditions, search, AliasName(aliasName)+".")
+}
+
+func Rollback(transaction *sqlx.Tx) {
+	if err := transaction.Rollback(); err != nil {
+		if !strings.Contains(
+			err.Error(),
+			"sql: transaction has already been committed or rolled back",
+		) {
+			log.Println(err, "Rollback transaction error")
+		}
+	}
 }

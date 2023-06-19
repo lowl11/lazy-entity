@@ -17,9 +17,12 @@ type ICrudRepository[T any, ID repositories.IComparableID] interface {
 	GetByIdList(id []ID) ([]T, error)
 
 	UpdateByID(id ID, entity T) error
+	UpdateByIdTx(tx *sqlx.Tx, id ID, entity T) error
 
 	DeleteAll() error
+	DeleteAllTx(tx *sqlx.Tx) error
 	DeleteByID(id ID) error
+	DeleteByIdTx(tx *sqlx.Tx, id ID) error
 }
 
 func NewCrud[T any, ID repositories.IComparableID](connection *sqlx.DB, tableName string, config repo_config.Crud) ICrudRepository[T, ID] {

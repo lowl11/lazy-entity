@@ -1,6 +1,7 @@
 package crud_repository
 
 import (
+	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
 	"github.com/lowl11/lazy-entity/builders/delete_builder"
 	"github.com/lowl11/lazy-entity/builders/select_builder"
@@ -38,12 +39,28 @@ func (repo *Repository[T, ID]) UpdateByID(id ID, entity T) error {
 	}, entity)
 }
 
+func (repo *Repository[T, ID]) UpdateByIdTx(tx *sqlx.Tx, id ID, entity T) error {
+	return repo.UpdateTx(tx, func(builder *update_builder.Builder) {
+		builder.Where(builder.Equal(repo.GetIdName(), id))
+	}, entity)
+}
+
 func (repo *Repository[T, ID]) DeleteAll() error {
 	return repo.Delete(func(builder *delete_builder.Builder) {})
 }
 
+func (repo *Repository[T, ID]) DeleteAllTx(tx *sqlx.Tx) error {
+	return repo.DeleteTx(tx, func(builder *delete_builder.Builder) {})
+}
+
 func (repo *Repository[T, ID]) DeleteByID(id ID) error {
 	return repo.Delete(func(builder *delete_builder.Builder) {
+		builder.Where(builder.Equal(repo.GetIdName(), id))
+	})
+}
+
+func (repo *Repository[T, ID]) DeleteByIdTx(tx *sqlx.Tx, id ID) error {
+	return repo.DeleteTx(tx, func(builder *delete_builder.Builder) {
 		builder.Where(builder.Equal(repo.GetIdName(), id))
 	})
 }

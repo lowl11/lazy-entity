@@ -2,6 +2,7 @@ package universal_repository
 
 import (
 	"fmt"
+	"github.com/jmoiron/sqlx"
 	"github.com/lowl11/lazy-entity/builders/delete_builder"
 	"github.com/lowl11/lazy-entity/builders/select_builder"
 	"github.com/lowl11/lazy-entity/builders/update_builder"
@@ -204,6 +205,36 @@ func (repo *Repository[T, ID]) Add(entity T) (ID, error) {
 	return id, nil
 }
 
+func (repo *Repository[T, ID]) AddTx(tx *sqlx.Tx, entity T) (ID, error) {
+	query := queryapi.
+		Insert(repo.tableName).
+		Fields(repo.getFields(false)...).
+		Returning(repo.idName).
+		VariableMode().
+		Build()
+
+	if repo.debug {
+		fmt.Println(query)
+	}
+
+	var id ID
+	rows, err := tx.NamedQuery(query, entity)
+	if err != nil {
+		return id, err
+	}
+
+	if !rows.Next() {
+		return id, nil
+	}
+
+	if err = rows.Scan(&id); err != nil {
+		return id, err
+	}
+	repo.CloseRows(rows)
+
+	return id, nil
+}
+
 func (repo *Repository[T, ID]) AddWithID(entity T) error {
 	repo.lock()
 	defer repo.unlock()
@@ -223,6 +254,31 @@ func (repo *Repository[T, ID]) AddWithID(entity T) error {
 	}
 
 	if _, err := repo.connection.NamedExecContext(ctx, query, entity); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (repo *Repository[T, ID]) AddWithIdTx(tx *sqlx.Tx, entity T) error {
+	repo.lock()
+	defer repo.unlock()
+
+	ctx, cancel := repo.Ctx()
+	defer cancel()
+
+	query := queryapi.
+		Insert(repo.tableName).
+		Fields(repo.getFields(true)...).
+		Returning(repo.idName).
+		VariableMode().
+		Build()
+
+	if repo.debug {
+		fmt.Println(query)
+	}
+
+	if _, err := tx.NamedExecContext(ctx, query, entity); err != nil {
 		return err
 	}
 
@@ -257,6 +313,34 @@ func (repo *Repository[T, ID]) AddList(entityList []T) error {
 	return nil
 }
 
+func (repo *Repository[T, ID]) AddListTx(tx *sqlx.Tx, entityList []T) error {
+	if len(entityList) == 0 {
+		return nil
+	}
+
+	repo.lock()
+	defer repo.unlock()
+
+	ctx, cancel := repo.Ctx()
+	defer cancel()
+
+	query := queryapi.
+		Insert(repo.tableName).
+		Fields(repo.getFields(false)...).
+		VariableMode().
+		Build()
+
+	if repo.debug {
+		fmt.Println(query)
+	}
+
+	if _, err := tx.NamedExecContext(ctx, query, entityList); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (repo *Repository[T, ID]) AddListWithID(entityList []T) error {
 	if len(entityList) == 0 {
 		return nil
@@ -279,6 +363,34 @@ func (repo *Repository[T, ID]) AddListWithID(entityList []T) error {
 	}
 
 	if _, err := repo.connection.NamedExecContext(ctx, query, entityList); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (repo *Repository[T, ID]) AddListWithIdTx(tx *sqlx.Tx, entityList []T) error {
+	if len(entityList) == 0 {
+		return nil
+	}
+
+	repo.lock()
+	defer repo.unlock()
+
+	ctx, cancel := repo.Ctx()
+	defer cancel()
+
+	query := queryapi.
+		Insert(repo.tableName).
+		Fields(repo.getFields(true)...).
+		VariableMode().
+		Build()
+
+	if repo.debug {
+		fmt.Println(query)
+	}
+
+	if _, err := tx.NamedExecContext(ctx, query, entityList); err != nil {
 		return err
 	}
 
@@ -318,6 +430,40 @@ func (repo *Repository[T, ID]) Update(
 	return nil
 }
 
+func (repo *Repository[T, ID]) UpdateTx(
+	tx *sqlx.Tx,
+	customizeFunc func(builder *update_builder.Builder),
+	entity T,
+) error {
+	repo.lock()
+	defer repo.unlock()
+
+	ctx, cancel := repo.Ctx()
+	defer cancel()
+
+	builder := queryapi.Update(repo.tableName)
+
+	nonEmptyIndices := type_helper.GetObjectNonEmptyIndices(&entity)
+	nonEmptyFields := repo.getNonEmptyFields(nonEmptyIndices)
+	if len(nonEmptyFields) == 0 {
+		return nil
+	}
+
+	builder.SetByFields(nonEmptyFields...)
+	customizeFunc(builder)
+
+	query := builder.Build()
+	if repo.debug {
+		fmt.Println(query)
+	}
+
+	if _, err := tx.NamedExecContext(ctx, query, entity); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (repo *Repository[T, ID]) Delete(customizeFunc func(builder *delete_builder.Builder), args ...any) error {
 	repo.lock()
 	defer repo.unlock()
@@ -338,4 +484,35 @@ func (repo *Repository[T, ID]) Delete(customizeFunc func(builder *delete_builder
 	}
 
 	return nil
+}
+
+func (repo *Repository[T, ID]) DeleteTx(tx *sqlx.Tx, customizeFunc func(builder *delete_builder.Builder), args ...any) error {
+	repo.lock()
+	defer repo.unlock()
+
+	ctx, cancel := repo.Ctx()
+	defer cancel()
+
+	builder := queryapi.Delete(repo.tableName)
+	customizeFunc(builder)
+
+	query := builder.Build()
+	if repo.debug {
+		fmt.Println(query)
+	}
+
+	if _, err := tx.ExecContext(ctx, query, args...); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (repo *Repository[T, ID]) Transaction(transactionActions func(tx *sqlx.Tx) error) error {
+	repo.lock()
+	defer repo.unlock()
+
+	return repo.Repository.Transaction(repo.connection, func(tx *sqlx.Tx) error {
+		return transactionActions(tx)
+	})
 }
