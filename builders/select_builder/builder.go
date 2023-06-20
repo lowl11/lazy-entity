@@ -3,14 +3,12 @@ package select_builder
 import (
 	"github.com/lowl11/lazy-entity/builders/condition_builder"
 	"github.com/lowl11/lazy-entity/enums/order_types"
-	"github.com/lowl11/lazy-entity/internal/services/grow_select_service"
+	"github.com/lowl11/lazy-entity/internal/grow_values"
 	"strings"
 )
 
 type Builder struct {
 	condition_builder.Builder
-
-	growService *grow_select_service.Service
 
 	fieldList        []string
 	tableName        string
@@ -23,12 +21,12 @@ type Builder struct {
 	groupByFields    []string
 	offset           int
 	limit            int
+
+	grow int
 }
 
 func New(fields ...string) *Builder {
 	builder := &Builder{
-		growService: grow_select_service.New(),
-
 		fieldList:     fields,
 		conditions:    &strings.Builder{},
 		joinList:      make([]joinModel, 0),
@@ -37,6 +35,8 @@ func New(fields ...string) *Builder {
 		groupByFields: make([]string, 0),
 		offset:        -1,
 		limit:         -1,
+
+		grow: grow_values.AdditionalSpace,
 	}
 
 	builder.Builder = condition_builder.New(builder.getFieldItem)

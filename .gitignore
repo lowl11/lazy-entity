@@ -8,3 +8,4 @@ main*.go
 app
 resources
 cmd
+*.pprof

@@ -2,6 +2,7 @@ package select_builder
 
 import (
 	"github.com/lowl11/lazy-entity/enums/join_types"
+	"github.com/lowl11/lazy-entity/internal/grow_values"
 	"github.com/lowl11/lazy-entity/internal/helpers/sql_helper"
 	"github.com/lowl11/lazy-entity/internal/query_helpers/select_helper"
 	"strings"
@@ -9,7 +10,7 @@ import (
 
 func (builder *Builder) Build() string {
 	query := strings.Builder{}
-	query.Grow(builder.growService.Get())
+	query.Grow(builder.grow)
 
 	// main template
 	select_helper.Main(&query, builder.getTableName(), builder.getFields())
@@ -74,19 +75,19 @@ func (builder *Builder) Build() string {
 
 func (builder *Builder) Fields(fieldList ...string) *Builder {
 	builder.fieldList = append(builder.fieldList, fieldList...)
-	builder.growService.Fields(len(fieldList))
+	builder.grow += grow_values.AvgFieldLen * len(fieldList)
 	return builder
 }
 
 func (builder *Builder) From(tableName string) *Builder {
 	builder.tableName = tableName
-	builder.growService.Table(&builder.tableName)
+	builder.grow += grow_values.SelectKeyword + grow_values.FromKeyword + len(tableName)
 	return builder
 }
 
 func (builder *Builder) Alias(aliasName string) *Builder {
 	builder.aliasName = sql_helper.AliasName(aliasName)
-	builder.growService.Alias(&builder.aliasName)
+	builder.grow += grow_values.AsKeyword + len(aliasName)
 	return builder
 }
 
@@ -97,7 +98,7 @@ func (builder *Builder) Join(tableName, aliasName, conditions string) *Builder {
 		Conditions: conditions,
 		joinType:   join_types.Inner,
 	})
-	builder.growService.Join(tableName, aliasName, conditions)
+	builder.grow += grow_values.InnerJoinKeyword + len(tableName) + len(aliasName) + len(conditions)
 	return builder
 }
 
@@ -108,7 +109,7 @@ func (builder *Builder) LeftJoin(tableName, aliasName, conditions string) *Build
 		Conditions: conditions,
 		joinType:   join_types.Left,
 	})
-	builder.growService.LeftJoin(tableName, aliasName, conditions)
+	builder.grow += grow_values.LeftJoinKeyword + len(tableName) + len(aliasName) + len(conditions)
 	return builder
 }
 
@@ -119,7 +120,7 @@ func (builder *Builder) RightJoin(tableName, aliasName, conditions string) *Buil
 		Conditions: conditions,
 		joinType:   join_types.Right,
 	})
-	builder.growService.RightJoin(tableName, aliasName, conditions)
+	builder.grow += grow_values.RightJoinKeyword + len(tableName) + len(aliasName) + len(conditions)
 	return builder
 }
 
@@ -138,7 +139,7 @@ func (builder *Builder) Where(conditions ...string) *Builder {
 
 	query := conditionArray.String()[:conditionArray.Len()-5]
 	builder.conditions.WriteString(query)
-	builder.growService.Where(query)
+	builder.grow += grow_values.WhereKeyword + len(query)
 	return builder
 }
 
@@ -157,26 +158,26 @@ func (builder *Builder) WhereOr(conditions ...string) *Builder {
 
 	query := conditionArray.String()[:conditionArray.Len()-5]
 	builder.conditions.WriteString(query)
-	builder.growService.Where(query)
+	builder.grow += grow_values.WhereKeyword + len(query)
 	return builder
 }
 
 func (builder *Builder) OrderBy(orderType string, fieldList ...string) *Builder {
 	builder.orderType = orderType
 	builder.orderFields = fieldList
-	builder.growService.OrderBy(len(fieldList))
+	builder.grow += grow_values.OrderByKeyword + grow_values.AvgFieldLen*len(fieldList)
 	return builder
 }
 
 func (builder *Builder) Having(expression string) *Builder {
 	builder.havingExpression = expression
-	builder.growService.Having()
+	builder.grow += grow_values.HavingKeyword + grow_values.AvgFieldLen
 	return builder
 }
 
 func (builder *Builder) GroupBy(fields ...string) *Builder {
 	builder.groupByFields = append(builder.groupByFields, fields...)
-	builder.growService.GroupBy(len(fields))
+	builder.grow += grow_values.GroupByKeyword + grow_values.AvgFieldLen
 	return builder
 }
 
@@ -210,12 +211,12 @@ func (builder *Builder) Avg(field string, value any, expression func(field strin
 
 func (builder *Builder) Offset(value int) *Builder {
 	builder.offset = value
-	builder.growService.Offset()
+	builder.grow += grow_values.OffsetKeyword + grow_values.AvgNumLen
 	return builder
 }
 
 func (builder *Builder) Limit(value int) *Builder {
 	builder.limit = value
-	builder.growService.Limit()
+	builder.grow += grow_values.LimitKeyword + grow_values.AvgNumLen
 	return builder
 }
