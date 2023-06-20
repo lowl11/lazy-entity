@@ -4,20 +4,6 @@ import (
 	"strings"
 )
 
-func OrderBy(query *strings.Builder, orderType, orderQueries string) {
-	query.WriteString("ORDER BY ")
-	query.WriteString(orderQueries)
-	query.WriteString(" ")
-	query.WriteString(orderType)
-	query.WriteString("\n")
-}
-
-func GroupBy(query *strings.Builder, groupQueries string) {
-	query.WriteString("GROUP BY ")
-	query.WriteString(groupQueries)
-	query.WriteString("\n")
-}
-
 func Having(query *strings.Builder, expression string) {
 	if expression == "" {
 		return

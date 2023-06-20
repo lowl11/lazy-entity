@@ -16,7 +16,7 @@ func (builder *Builder) Build() string {
 	query.WriteString("SELECT ")
 	builder.getFields(&query)
 	query.WriteString("\nFROM ")
-	query.WriteString(builder.getTableName())
+	builder.getTableName(&query)
 	query.WriteString("\n")
 
 	// join template
@@ -39,58 +39,66 @@ func (builder *Builder) Build() string {
 
 	// order by template
 	if len(builder.orderFields) > 0 {
-		orderQueries := strings.Builder{}
-		for _, item := range builder.orderFields {
-			orderQueries.WriteString(builder.getFieldItem(item))
-			orderQueries.WriteString(", ")
+		query.WriteString("ORDER BY ")
+
+		for index, item := range builder.orderFields {
+			query.WriteString(builder.getFieldItem(item))
+
+			if index < len(builder.orderFields)-1 {
+				query.WriteString(", ")
+			}
 		}
 
-		select_helper.OrderBy(&query, builder.orderType, orderQueries.String()[:orderQueries.Len()-2])
+		query.WriteString(" ")
+		query.WriteString(builder.orderType)
+		query.WriteString("\n")
 	}
 
 	// group by template
 	if len(builder.groupByFields) > 0 {
-		groupQueries := strings.Builder{}
-		for _, item := range builder.groupByFields {
-			groupQueries.WriteString(builder.getFieldItem(item))
-			groupQueries.WriteString(", ")
-		}
+		query.WriteString("GROUP BY ")
+		for index, item := range builder.groupByFields {
+			query.WriteString(builder.getFieldItem(item))
 
-		select_helper.GroupBy(&query, groupQueries.String()[:groupQueries.Len()-2])
+			if index < len(builder.groupByFields)-1 {
+				query.WriteString(", ")
+			}
+		}
+		query.WriteString("\n")
 	}
 
 	// having template
 	select_helper.Having(&query, builder.havingExpression)
 
 	// offset template
-	if offset := builder.getOffset(); offset != "" {
-		query.WriteString(offset)
-		query.WriteString("\n")
-	}
+	builder.getOffset(&query)
 
 	// limit template
-	if limit := builder.getLimit(); limit != "" {
-		query.WriteString(limit)
-		query.WriteString("\n")
-	}
+	builder.getLimit(&query)
 
 	return query.String()
 }
 
 func (builder *Builder) Fields(fieldList ...string) *Builder {
 	builder.fieldList = append(builder.fieldList, fieldList...)
+
+	// calculate grow
 	builder.grow += grow_values.AvgFieldLen * len(fieldList)
 	return builder
 }
 
 func (builder *Builder) From(tableName string) *Builder {
 	builder.tableName = tableName
+
+	// calculate grow
 	builder.grow += grow_values.SelectKeyword + grow_values.FromKeyword + len(tableName)
 	return builder
 }
 
 func (builder *Builder) Alias(aliasName string) *Builder {
 	builder.aliasName = sql_helper.AliasName(aliasName)
+
+	// calculate grow
 	builder.grow += grow_values.AsKeyword + len(aliasName)
 	return builder
 }
@@ -102,6 +110,8 @@ func (builder *Builder) Join(tableName, aliasName, conditions string) *Builder {
 		Conditions: conditions,
 		joinType:   join_types.Inner,
 	})
+
+	// calculate grow
 	builder.grow += grow_values.InnerJoinKeyword + len(tableName) + len(aliasName) + len(conditions)
 	return builder
 }
@@ -113,6 +123,8 @@ func (builder *Builder) LeftJoin(tableName, aliasName, conditions string) *Build
 		Conditions: conditions,
 		joinType:   join_types.Left,
 	})
+
+	// calculate grow
 	builder.grow += grow_values.LeftJoinKeyword + len(tableName) + len(aliasName) + len(conditions)
 	return builder
 }
@@ -124,6 +136,8 @@ func (builder *Builder) RightJoin(tableName, aliasName, conditions string) *Buil
 		Conditions: conditions,
 		joinType:   join_types.Right,
 	})
+
+	// calculate grow
 	builder.grow += grow_values.RightJoinKeyword + len(tableName) + len(aliasName) + len(conditions)
 	return builder
 }
@@ -143,6 +157,8 @@ func (builder *Builder) Where(conditions ...string) *Builder {
 
 	query := conditionArray.String()[:conditionArray.Len()-5]
 	builder.conditions.WriteString(query)
+
+	// calculate grow
 	builder.grow += grow_values.WhereKeyword + len(query)
 	return builder
 }
@@ -162,6 +178,8 @@ func (builder *Builder) WhereOr(conditions ...string) *Builder {
 
 	query := conditionArray.String()[:conditionArray.Len()-5]
 	builder.conditions.WriteString(query)
+
+	// calculate grow
 	builder.grow += grow_values.WhereKeyword + len(query)
 	return builder
 }
@@ -169,18 +187,24 @@ func (builder *Builder) WhereOr(conditions ...string) *Builder {
 func (builder *Builder) OrderBy(orderType string, fieldList ...string) *Builder {
 	builder.orderType = orderType
 	builder.orderFields = fieldList
+
+	// calculate grow
 	builder.grow += grow_values.OrderByKeyword + grow_values.AvgFieldLen*len(fieldList)
 	return builder
 }
 
 func (builder *Builder) Having(expression string) *Builder {
 	builder.havingExpression = expression
+
+	// calculate grow
 	builder.grow += grow_values.HavingKeyword + grow_values.AvgFieldLen
 	return builder
 }
 
 func (builder *Builder) GroupBy(fields ...string) *Builder {
 	builder.groupByFields = append(builder.groupByFields, fields...)
+
+	// calculate grow
 	builder.grow += grow_values.GroupByKeyword + grow_values.AvgFieldLen
 	return builder
 }
@@ -215,12 +239,16 @@ func (builder *Builder) Avg(field string, value any, expression func(field strin
 
 func (builder *Builder) Offset(value int) *Builder {
 	builder.offset = value
+
+	// calculate grow
 	builder.grow += grow_values.OffsetKeyword + grow_values.AvgNumLen
 	return builder
 }
 
 func (builder *Builder) Limit(value int) *Builder {
 	builder.limit = value
+
+	// calculate grow
 	builder.grow += grow_values.LimitKeyword + grow_values.AvgNumLen
 	return builder
 }

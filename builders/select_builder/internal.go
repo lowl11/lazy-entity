@@ -63,31 +63,33 @@ func (builder *Builder) getFieldItem(value string) string {
 	return alias + value
 }
 
-func (builder *Builder) getTableName() string {
-	tableName := strings.Builder{}
+func (builder *Builder) getTableName(query *strings.Builder) {
 	if len(builder.aliasName) > 0 {
-		tableName.WriteString(builder.tableName)
-		tableName.WriteString(" AS ")
-		tableName.WriteString(builder.aliasName)
-	} else {
-		tableName.WriteString(builder.tableName)
+		query.WriteString(builder.tableName)
+		query.WriteString(" AS ")
+		query.WriteString(builder.aliasName)
+		return
 	}
 
-	return tableName.String()
+	query.WriteString(builder.tableName)
 }
 
-func (builder *Builder) getOffset() string {
+func (builder *Builder) getOffset(query *strings.Builder) {
 	if builder.offset < 0 {
-		return ""
+		return
 	}
 
-	return "OFFSET " + type_helper.ToString(builder.offset)
+	query.WriteString("OFFSET ")
+	query.WriteString(type_helper.ToString(builder.offset))
+	query.WriteString("\n")
 }
 
-func (builder *Builder) getLimit() string {
+func (builder *Builder) getLimit(query *strings.Builder) {
 	if builder.limit < 0 {
-		return ""
+		return
 	}
 
-	return "LIMIT " + type_helper.ToString(builder.limit)
+	query.WriteString("LIMIT ")
+	query.WriteString(type_helper.ToString(builder.limit))
+	query.WriteString("\n")
 }
