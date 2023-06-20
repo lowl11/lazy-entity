@@ -7,3 +7,4 @@ main.go
 main*.go
 app
 resources
+cmd

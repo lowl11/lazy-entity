@@ -1,22 +1,5 @@
 package grow_select_service
 
-/*
-	field = len(aliasName) + 1 (dot) + len(fieldName) + 8 (spaces) + 1 (запятая)
-	fieldList = fieldCount * field
-
-	join = 8 (spaces) + len(join type) + 6 (keyword JOIN with spaces) + len(table name) + 4 (keyword AS with spaces) + len(aliasName) + 4 (keyword ON with spaces) + len(condition) + 2 (скобки)
-	joinList = joinCount * join
-	condition = 8 (spaces) + len(aliasName) + 1 (dot) + len(fieldName) + len(condition_sign) + 2 spaces + len(value) + AND/OR (3/2 len)
-	conditionList = conditionCount * condition
-	where = 5 (keyword WHERE) + conditionList
-	order_by = 9 (keyword order by + space) + len(aliasName) + 1 (dot) + len(fieldName) ASC/DESC(3/4 len)
-	group_by = 9 (keyword group by + space) + len(aliasName) + 1 (dot) + len(fieldName)
-	having = 8 (keyword having + space) + len(condition)
-	offset = 7 (keyword offset + space) + len(value)
-	limit = 7 (keyword limit + space) + len(value)
-	+ 100 (запас)
-*/
-
 func (service *Service) Get() int {
 	return service.grow + additionalSpace
 }
