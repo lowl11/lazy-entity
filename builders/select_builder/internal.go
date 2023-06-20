@@ -7,30 +7,33 @@ import (
 	"strings"
 )
 
-func (builder *Builder) getFields() string {
+func (builder *Builder) getFields(query *strings.Builder) {
 	if len(builder.fieldList) == 0 {
-		return "\n\t*"
+		query.WriteString("\n\t*")
+		return
 	}
 
 	if len(builder.aliasName) > 0 {
-		alias := strings.Builder{}
-		for _, item := range builder.fieldList {
-			alias.WriteString("\n\t")
-			alias.WriteString(builder.getFieldItem(item))
-			alias.WriteString(",")
+		for index, item := range builder.fieldList {
+			query.WriteString("\n\t")
+			query.WriteString(builder.getFieldItem(item))
+
+			if index < len(builder.fieldList)-1 {
+				query.WriteString(",")
+			}
 		}
 
-		return alias.String()[:alias.Len()-1]
+		return
 	}
 
-	tab := strings.Builder{}
-	for _, item := range builder.fieldList {
-		tab.WriteString("\n\t")
-		tab.WriteString(builder.getFieldItem(item))
-		tab.WriteString(", ")
-	}
+	for index, item := range builder.fieldList {
+		query.WriteString("\n\t")
+		query.WriteString(builder.getFieldItem(item))
 
-	return tab.String()[:tab.Len()-2]
+		if index < len(builder.fieldList)-1 {
+			query.WriteString(", ")
+		}
+	}
 }
 
 func (builder *Builder) getFieldItem(value string) string {

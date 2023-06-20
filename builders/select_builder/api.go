@@ -13,7 +13,11 @@ func (builder *Builder) Build() string {
 	query.Grow(builder.grow)
 
 	// main template
-	select_helper.Main(&query, builder.getTableName(), builder.getFields())
+	query.WriteString("SELECT ")
+	builder.getFields(&query)
+	query.WriteString("\nFROM ")
+	query.WriteString(builder.getTableName())
+	query.WriteString("\n")
 
 	// join template
 	for _, item := range builder.joinList {

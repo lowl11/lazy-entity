@@ -4,14 +4,6 @@ import (
 	"strings"
 )
 
-func Main(query *strings.Builder, tableName, fields string) {
-	query.WriteString("SELECT ")
-	query.WriteString(fields)
-	query.WriteString("\nFROM ")
-	query.WriteString(tableName)
-	query.WriteString("\n")
-}
-
 func OrderBy(query *strings.Builder, orderType, orderQueries string) {
 	query.WriteString("ORDER BY ")
 	query.WriteString(orderQueries)
