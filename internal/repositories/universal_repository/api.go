@@ -30,6 +30,11 @@ func (repo *Repository[T, ID]) IdName(name string) *Repository[T, ID] {
 	return repo
 }
 
+func (repo *Repository[T, ID]) PageSize(size int) *Repository[T, ID] {
+	repo.pageSize = size
+	return repo
+}
+
 func (repo *Repository[T, ID]) Joins(joinList ...repo_config.Join) *Repository[T, ID] {
 	repo.joinList = append(repo.joinList, joinList...)
 	return repo
@@ -133,6 +138,23 @@ func (repo *Repository[T, ID]) GetList(customizeFunc func(builder *select_builde
 	}
 
 	return list, nil
+}
+
+func (repo *Repository[T, ID]) GetPage(pageNum int, customizeFunc func(builder *select_builder.Builder), args ...any) ([]T, error) {
+	return repo.GetList(func(builder *select_builder.Builder) {
+		customizeFunc(builder)
+
+		pageSize := repo.pageSize
+
+		// if page size is not given
+		if pageSize == 0 {
+			pageSize = 10
+		}
+
+		builder.
+			Offset(pageNum * pageSize).
+			Limit(pageSize)
+	})
 }
 
 func (repo *Repository[T, ID]) GetItem(customizeFunc func(builder *select_builder.Builder), args ...any) (*T, error) {

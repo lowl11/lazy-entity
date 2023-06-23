@@ -21,6 +21,8 @@ type Repository[T any, ID repositories.IComparableID] struct {
 	idName    string
 	joinList  []repo_config.Join
 
+	pageSize int
+
 	threadSafe bool
 	debug      bool
 

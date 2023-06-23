@@ -14,8 +14,9 @@ type IUniversalRepository[T any, ID repositories.IComparableID] interface {
 	Count() (int, error)
 	Exist(customizeFunc func(builder *select_builder.Builder), args ...any) (bool, error)
 
-	GetList(func(builder *select_builder.Builder), ...any) ([]T, error)
 	GetItem(func(builder *select_builder.Builder), ...any) (*T, error)
+	GetList(func(builder *select_builder.Builder), ...any) ([]T, error)
+	GetPage(int, func(builder *select_builder.Builder), ...any) ([]T, error)
 
 	Add(entity T) (ID, error)
 	AddTx(tx *sqlx.Tx, entity T) (ID, error)

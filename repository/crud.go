@@ -27,7 +27,11 @@ type ICrudRepository[T any, ID repositories.IComparableID] interface {
 
 func NewCrud[T any, ID repositories.IComparableID](connection *sqlx.DB, tableName string, config repo_config.Crud) ICrudRepository[T, ID] {
 	newRepo := crud_repository.New[T, ID](connection, tableName)
-	newRepo.Alias(config.AliasName).IdName(config.IdName).Joins(config.Joins...)
+	newRepo.
+		Alias(config.AliasName).
+		IdName(config.IdName).
+		Joins(config.Joins...).
+		PageSize(config.PageSize)
 
 	if config.Debug {
 		newRepo.Debug()
