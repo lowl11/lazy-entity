@@ -1,11 +1,15 @@
+# IDE folders
 .idea
-config
+.vscode
+
+# executable folders
+cmd
+
+# additional files which can be used
 *.exe
 *.log
 logs
-main.go
-main*.go
-app
-resources
-cmd
 *.pprof
+
+# business application folders (not for libraries)
+resources
