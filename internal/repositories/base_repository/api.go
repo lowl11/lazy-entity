@@ -2,11 +2,12 @@ package base_repository
 
 import (
 	"context"
-	"github.com/google/uuid"
-	"github.com/jmoiron/sqlx"
 	"log"
 	"strings"
 	"time"
+
+	"github.com/google/uuid"
+	"github.com/jmoiron/sqlx"
 )
 
 func (repo *Repository) Guid() string {
@@ -14,7 +15,7 @@ func (repo *Repository) Guid() string {
 }
 
 func (repo *Repository) Ctx(customTimeout ...time.Duration) (context.Context, func()) {
-	defaultTimeout := time.Second * 5
+	defaultTimeout := time.Second * 30
 	if len(customTimeout) > 0 {
 		defaultTimeout = customTimeout[0]
 	}
