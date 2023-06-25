@@ -18,15 +18,15 @@ type ICrudRepository[T any, ID repositories.IComparableID] interface {
 	// GetAll returns all records
 	GetAll() ([]T, error)
 
-	// GetByID returns record by ID. 
+	// GetByID returns record by ID.
 	// If the record with such ID does not exist, returns NULL (nil)
 	GetByID(id ID) (*T, error)
 
 	// GetByIdList returns list of records by array of IDs.
-	// Some of IDs could be not existing, there wouldn't be an error
+	// Some IDs could be not existing, there wouldn't be an error
 	GetByIdList(id []ID) ([]T, error)
 
-	// UpdateByID updates an record by ID
+	// UpdateByID updates a record by ID
 	UpdateByID(id ID, entity T) error
 
 	// UpdateByIdTx the same as UpdateByID but using transaction
