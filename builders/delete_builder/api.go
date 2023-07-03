@@ -5,19 +5,21 @@ import (
 )
 
 func (builder *Builder) Build() string {
-	queries := make([]string, 0, 2)
+	query := strings.Builder{}
 
 	// main template
-	main := "DELETE FROM " + builder.tableName
-	queries = append(queries, main)
+	query.WriteString("DELETE FROM ")
+	query.WriteString(builder.tableName)
+	query.WriteString("\n")
 
 	// where template
 	if builder.conditions.Len() > 0 {
-		where := "WHERE " + builder.conditions.String()
-		queries = append(queries, where)
+		query.WriteString("WHERE ")
+		query.WriteString(builder.conditions.String())
+		query.WriteString("\n")
 	}
 
-	return strings.Join(queries, "\n")
+	return query.String()
 }
 
 func (builder *Builder) Where(conditions ...string) *Builder {
