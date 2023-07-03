@@ -7,7 +7,7 @@ const (
 )
 
 var (
-	keywords = []string{
+	keywords = [...]string{
 		"id", "group", "user",
 	}
 )

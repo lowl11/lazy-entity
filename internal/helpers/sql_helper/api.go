@@ -62,19 +62,35 @@ func IsKeyword(word string) bool {
 }
 
 func AliasName(name string) string {
+	buildAlias := func(before, after string) string {
+		alias := strings.Builder{}
+		alias.Grow(len(before) + len(after) + 10)
+		alias.WriteString("\"")
+		alias.WriteString(before)
+		alias.WriteString("\".")
+		alias.WriteString(after)
+		return alias.String()
+	}
+
 	if strings.Contains(name, ".") {
 		before, after, _ := strings.Cut(name, ".")
 		if IsKeyword(before) {
-			return "\"" + before + "\"" + "." + after
+			return buildAlias(before, after)
 		}
 	}
 
 	if IsKeyword(name) {
 		if strings.Contains(name, ".") {
 			before, after, _ := strings.Cut(name, ".")
-			return "\"" + before + "\"" + "." + after
+			return buildAlias(before, after)
 		}
-		return "\"" + name + "\""
+
+		alias := strings.Builder{}
+		alias.Grow(len(name) + 4)
+		alias.WriteString("\"")
+		alias.WriteString(name)
+		alias.WriteString("\"")
+		return alias.String()
 	}
 
 	return name
