@@ -10,6 +10,10 @@ import (
 )
 
 func ToString(anyValue any) string {
+	if anyValue == nil {
+		return ""
+	}
+
 	if _, ok := anyValue.(error); ok {
 		return anyValue.(error).Error()
 	}
