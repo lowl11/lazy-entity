@@ -19,16 +19,6 @@ func (service *Service) Read() error {
 	return nil
 }
 
-func (service *Service) StartPath(path string) *Service {
-	service.startPath = path
-	return service
-}
-
-func (service *Service) ScriptPath(path string) *Service {
-	service.scriptsPath = path
-	return service
-}
-
 // GetStartScript get script from folder /resources/scripts/start/<script_file>.sql
 func (service *Service) GetStartScript(script string) string {
 	if service.startScripts == nil || len(service.startScripts) == 0 {

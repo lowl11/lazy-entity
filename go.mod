@@ -6,5 +6,5 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/lib/pq v1.2.0
-	github.com/lowl11/lazyfile v0.1.3
+	github.com/lowl11/lazyfile v0.1.6
 )

@@ -1,73 +1,67 @@
 package script_service
 
 import (
-	"github.com/lowl11/lazyfile/folderapi"
+	"errors"
+	managerErrors "github.com/lowl11/lazyfile/data/errors"
 )
 
 const (
-	defaultResourcesPath = "resources"
-	defaultScriptsPath   = defaultResourcesPath + "/scripts"
-	defaultStartPath     = defaultResourcesPath + "/scripts/start"
+	defaultResourcesPath = "resources/scripts"
 )
 
 func (service *Service) readStartScripts() error {
-	if !folderapi.Exist(service.startPath) {
-		return nil
+	startFolder, err := service.manager.Folder("start")
+	if err != nil {
+		if errors.Is(err, managerErrors.FolderNotExist) {
+			return nil
+		}
+
+		return err
 	}
 
-	files, err := folderapi.Objects(service.startPath)
+	files, err := startFolder.FileList()
 	if err != nil {
 		return err
 	}
 
 	for _, file := range files {
-		if file.IsFolder {
-			continue
-		}
-
-		body, err := file.Read()
-		if err != nil {
-			return err
-		}
-
-		service.startScripts[file.Name] = string(body)
+		service.startScripts[file.Name()] = file.String()
 	}
 
 	return nil
 }
 
 func (service *Service) readScripts() error {
-	if !folderapi.Exist(service.scriptsPath) {
-		return nil
+	if err := service.manager.Sync(); err != nil {
+		if errors.Is(err, managerErrors.FolderNotExist); err != nil {
+			return nil
+		}
+
+		return err
 	}
 
-	folders, err := folderapi.Objects(service.scriptsPath)
+	folders, err := service.manager.FolderList()
 	if err != nil {
 		return err
 	}
 
 	for _, folder := range folders {
-		if !folder.IsFolder {
+		if folder.Name() == "start" {
 			continue
 		}
 
 		folderMap := make(map[string]string)
 
-		files, err := folderapi.Objects(service.scriptsPath + "/" + folder.Name)
+		files, err := folder.FileList()
 		if err != nil {
 			return err
 		}
 
-		for _, file := range files {
-			body, err := file.Read()
-			if err != nil {
-				return err
-			}
-
-			folderMap[file.Name] = string(body)
+		for _, script := range files {
+			folderMap[script.Name()] = script.String()
 		}
 
-		service.scripts[folder.Name] = folderMap
+		service.scripts[folder.Name()] = folderMap
 	}
 
 	return nil

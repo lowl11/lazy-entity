@@ -19,14 +19,6 @@ type IScriptRepository interface {
 	// Start returns script from "start" folder.
 	// If script name will be wrong, method will return empty string
 	Start(name string) string
-
-	// ScriptPath will change scripts path to the given one.
-	// By default, it is /resources folder
-	ScriptPath(path string)
-
-	// StartPath will change start scripts path to the given one.
-	// By default, it is /resources/scripts/start folder
-	StartPath(path string)
 }
 
 func NewScript() IScriptRepository {

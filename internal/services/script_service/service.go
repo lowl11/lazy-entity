@@ -1,18 +1,19 @@
 package script_service
 
+import (
+	"github.com/lowl11/lazyfile/data/interfaces"
+	"github.com/lowl11/lazyfile/fmanager"
+)
+
 type Service struct {
+	manager interfaces.IManager
+
 	startScripts map[string]string
 	scripts      map[string]any
-
-	resourcesPath string
-	scriptsPath   string
-	startPath     string
 }
 
 func New() *Service {
 	return &Service{
-		resourcesPath: defaultResourcesPath,
-		scriptsPath:   defaultScriptsPath,
-		startPath:     defaultStartPath,
+		manager: fmanager.New(defaultResourcesPath),
 	}
 }

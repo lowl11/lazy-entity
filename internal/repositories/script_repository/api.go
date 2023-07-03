@@ -11,11 +11,3 @@ func (repo *Repository) Get(folder, name string) string {
 func (repo *Repository) Start(name string) string {
 	return repo.scriptService.GetStartScript(name)
 }
-
-func (repo *Repository) StartPath(path string) {
-	repo.scriptService.StartPath(path)
-}
-
-func (repo *Repository) ScriptPath(path string) {
-	repo.scriptService.ScriptPath(path)
-}
