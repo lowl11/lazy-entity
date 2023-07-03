@@ -21,11 +21,11 @@ type IScriptRepository interface {
 	Start(name string) string
 
 	// ScriptPath will change scripts path to the given one.
-	// By default it is /resources folder
+	// By default, it is /resources folder
 	ScriptPath(path string)
 
 	// StartPath will change start scripts path to the given one.
-	// By default it is /resources/scripts/start folder
+	// By default, it is /resources/scripts/start folder
 	StartPath(path string)
 }
 
