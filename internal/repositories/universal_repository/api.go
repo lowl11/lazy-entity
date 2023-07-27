@@ -541,7 +541,7 @@ func (repo *Repository[T, ID]) Transaction(transactionActions func(tx *sqlx.Tx) 
 	repo.lock()
 	defer repo.unlock()
 
-	return repo.Repository.Transaction(repo.connection, func(tx *sqlx.Tx) error {
+	return repo.Repository.TransactionQuery(repo.connection, func(tx *sqlx.Tx) error {
 		return transactionActions(tx)
 	})
 }
