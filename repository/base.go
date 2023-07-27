@@ -27,9 +27,9 @@ type IRepository interface {
 	// It is not error if it was already commited
 	Rollback(transaction *sqlx.Tx)
 
-	// Transaction provides transaction (*sqlx.Tx) object to transactionActions.
+	// TransactionQuery provides transaction (*sqlx.Tx) object to transactionActions.
 	// COMMIT and ROLLBACK calls automatically
-	Transaction(connection *sqlx.DB, transactionActions func(tx *sqlx.Tx) error) error
+	TransactionQuery(connection *sqlx.DB, transactionActions func(tx *sqlx.Tx) error) error
 }
 
 func NewBase() IRepository {

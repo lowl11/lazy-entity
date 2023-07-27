@@ -15,6 +15,8 @@ type ICrudRepository[T any, ID repositories.IComparableID] interface {
 	// ExistByID returns true if record exist
 	ExistByID(id ID) (bool, error)
 
+	CountAll() (int, error)
+
 	// GetAll returns all records
 	GetAll() ([]T, error)
 

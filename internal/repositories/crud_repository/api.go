@@ -9,6 +9,10 @@ import (
 	"github.com/lowl11/lazy-entity/enums/order_types"
 )
 
+func (repo *Repository[T, ID]) CountAll() (int, error) {
+	return repo.Count(func(builder *select_builder.Builder) {})
+}
+
 func (repo *Repository[T, ID]) ExistByID(id ID) (bool, error) {
 	return repo.Exist(func(builder *select_builder.Builder) {
 		builder.Where(builder.Equal(repo.GetIdName(), "$1"))

@@ -39,7 +39,7 @@ func (repo *Repository) Rollback(transaction *sqlx.Tx) {
 	}
 }
 
-func (repo *Repository) Transaction(connection *sqlx.DB, transactionActions func(tx *sqlx.Tx) error) error {
+func (repo *Repository) TransactionQuery(connection *sqlx.DB, transactionActions func(tx *sqlx.Tx) error) error {
 	transaction, err := connection.Beginx()
 	if err != nil {
 		return err

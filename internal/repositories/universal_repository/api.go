@@ -80,14 +80,17 @@ func (repo *Repository[T, ID]) Exist(customizeFunc func(builder *select_builder.
 	return rows.Next(), nil
 }
 
-func (repo *Repository[T, ID]) Count() (int, error) {
+func (repo *Repository[T, ID]) Count(customizeFunc func(builder *select_builder.Builder)) (int, error) {
 	ctx, cancel := repo.Ctx()
 	defer cancel()
 
-	query := queryapi.
-		Select("count(*)").
+	builder := queryapi.Select("count(*)")
+
+	query := builder.
 		From(repo.tableName).
 		Build()
+
+	customizeFunc(builder)
 
 	if repo.debug {
 		fmt.Println(query)

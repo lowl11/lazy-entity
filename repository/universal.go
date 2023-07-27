@@ -19,7 +19,7 @@ type IUniversalRepository[T any, ID repositories.IComparableID] interface {
 	// Count get quantity of all records of entity.
 	// For counting some "specific" amount of records with condition.
 	// 	use Select("COUNT(*)").From("table_name").Where(...)
-	Count() (int, error)
+	Count(customizeFunc func(builder *select_builder.Builder)) (int, error)
 
 	// Exist returns true if record is found.
 	// Without conditions, it will return true if there is at least 1 record
