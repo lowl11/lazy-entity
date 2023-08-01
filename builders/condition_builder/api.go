@@ -29,6 +29,14 @@ func (builder *Builder) NotEqual(field string, value any) string {
 	return builder.statement(field, " != ", value)
 }
 
+func (builder *Builder) Is(field string, value any) string {
+	return builder.statement(field, " IS ", value)
+}
+
+func (builder *Builder) NotIs(field string, value any) string {
+	return builder.statement(field, " IS NOT ", value)
+}
+
 func (builder *Builder) In(field string, value any) string {
 	return builder.statement(field, " = ANY(", value)
 }

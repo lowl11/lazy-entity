@@ -10,7 +10,7 @@ type Crud struct {
 	IdName string
 
 	// PageSize is how many items contain one page.
-	// By default page size is 10
+	// By default, page size is 10
 	PageSize int
 
 	// Joins is list of joins which can be used in queries.
