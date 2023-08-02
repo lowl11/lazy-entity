@@ -118,9 +118,17 @@ func GetObjectNonEmptyIndices(object any) []int {
 
 	list := make([]int, 0, element.NumField())
 	for i := 0; i < element.NumField(); i++ {
-		if !element.Field(i).IsZero() {
+		field := element.Field(i)
+
+		if field.Kind() == reflect.Ptr && field.IsNil() {
+			list = append(list, i)
+			continue
+		}
+
+		if !field.IsZero() {
 			list = append(list, i)
 		}
 	}
+
 	return list
 }
