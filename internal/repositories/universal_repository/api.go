@@ -1,11 +1,13 @@
 package universal_repository
 
 import (
+	"context"
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"github.com/lowl11/lazy-entity/builders/delete_builder"
 	"github.com/lowl11/lazy-entity/builders/select_builder"
 	"github.com/lowl11/lazy-entity/builders/update_builder"
+	"github.com/lowl11/lazy-entity/internal/helpers/context_helper"
 	"github.com/lowl11/lazy-entity/internal/helpers/type_helper"
 	"github.com/lowl11/lazy-entity/queryapi"
 	"github.com/lowl11/lazy-entity/repo_config"
@@ -55,8 +57,8 @@ func (repo *Repository[T, ID]) Debug() *Repository[T, ID] {
 	return repo
 }
 
-func (repo *Repository[T, ID]) Exist(customizeFunc func(builder *select_builder.Builder), args ...any) (bool, error) {
-	ctx, cancel := repo.Ctx()
+func (repo *Repository[T, ID]) Exist(ctx context.Context, customizeFunc func(builder *select_builder.Builder), args ...any) (bool, error) {
+	ctx, cancel := context_helper.GetContext(ctx, repo.Ctx)
 	defer cancel()
 
 	builder := queryapi.Select()
@@ -80,8 +82,8 @@ func (repo *Repository[T, ID]) Exist(customizeFunc func(builder *select_builder.
 	return rows.Next(), nil
 }
 
-func (repo *Repository[T, ID]) Count(customizeFunc func(builder *select_builder.Builder)) (int, error) {
-	ctx, cancel := repo.Ctx()
+func (repo *Repository[T, ID]) Count(ctx context.Context, customizeFunc func(builder *select_builder.Builder)) (int, error) {
+	ctx, cancel := context_helper.GetContext(ctx, repo.Ctx)
 	defer cancel()
 
 	builder := queryapi.Select("count(*)")
@@ -104,8 +106,8 @@ func (repo *Repository[T, ID]) Count(customizeFunc func(builder *select_builder.
 	return count, nil
 }
 
-func (repo *Repository[T, ID]) GetList(customizeFunc func(builder *select_builder.Builder), args ...any) ([]T, error) {
-	ctx, cancel := repo.Ctx()
+func (repo *Repository[T, ID]) GetList(ctx context.Context, customizeFunc func(builder *select_builder.Builder), args ...any) ([]T, error) {
+	ctx, cancel := context_helper.GetContext(ctx, repo.Ctx)
 	defer cancel()
 
 	builder := queryapi.Select()
@@ -143,8 +145,8 @@ func (repo *Repository[T, ID]) GetList(customizeFunc func(builder *select_builde
 	return list, nil
 }
 
-func (repo *Repository[T, ID]) GetPage(pageNum int, customizeFunc func(builder *select_builder.Builder), args ...any) ([]T, error) {
-	return repo.GetList(func(builder *select_builder.Builder) {
+func (repo *Repository[T, ID]) GetPage(ctx context.Context, pageNum int, customizeFunc func(builder *select_builder.Builder), args ...any) ([]T, error) {
+	return repo.GetList(ctx, func(builder *select_builder.Builder) {
 		customizeFunc(builder)
 
 		pageSize := repo.pageSize
@@ -160,8 +162,8 @@ func (repo *Repository[T, ID]) GetPage(pageNum int, customizeFunc func(builder *
 	})
 }
 
-func (repo *Repository[T, ID]) GetItem(customizeFunc func(builder *select_builder.Builder), args ...any) (*T, error) {
-	ctx, cancel := repo.Ctx()
+func (repo *Repository[T, ID]) GetItem(ctx context.Context, customizeFunc func(builder *select_builder.Builder), args ...any) (*T, error) {
+	ctx, cancel := context_helper.GetContext(ctx, repo.Ctx)
 	defer cancel()
 
 	builder := queryapi.Select()
@@ -199,11 +201,11 @@ func (repo *Repository[T, ID]) GetItem(customizeFunc func(builder *select_builde
 	return nil, nil
 }
 
-func (repo *Repository[T, ID]) Add(entity T) (ID, error) {
+func (repo *Repository[T, ID]) Add(ctx context.Context, entity T) (ID, error) {
 	repo.lock()
 	defer repo.unlock()
 
-	ctx, cancel := repo.Ctx()
+	ctx, cancel := context_helper.GetContext(ctx, repo.Ctx)
 	defer cancel()
 
 	query := queryapi.
@@ -234,7 +236,10 @@ func (repo *Repository[T, ID]) Add(entity T) (ID, error) {
 	return id, nil
 }
 
-func (repo *Repository[T, ID]) AddTx(tx *sqlx.Tx, entity T) (ID, error) {
+func (repo *Repository[T, ID]) AddTx(ctx context.Context, tx *sqlx.Tx, entity T) (ID, error) {
+	ctx, cancel := context_helper.GetContext(ctx, repo.Ctx)
+	defer cancel()
+
 	query := queryapi.
 		Insert(repo.tableName).
 		Fields(repo.getFields(false)...).
@@ -264,11 +269,11 @@ func (repo *Repository[T, ID]) AddTx(tx *sqlx.Tx, entity T) (ID, error) {
 	return id, nil
 }
 
-func (repo *Repository[T, ID]) AddWithID(entity T) error {
+func (repo *Repository[T, ID]) AddWithID(ctx context.Context, entity T) error {
 	repo.lock()
 	defer repo.unlock()
 
-	ctx, cancel := repo.Ctx()
+	ctx, cancel := context_helper.GetContext(ctx, repo.Ctx)
 	defer cancel()
 
 	query := queryapi.
@@ -289,11 +294,11 @@ func (repo *Repository[T, ID]) AddWithID(entity T) error {
 	return nil
 }
 
-func (repo *Repository[T, ID]) AddWithIdTx(tx *sqlx.Tx, entity T) error {
+func (repo *Repository[T, ID]) AddWithIdTx(ctx context.Context, tx *sqlx.Tx, entity T) error {
 	repo.lock()
 	defer repo.unlock()
 
-	ctx, cancel := repo.Ctx()
+	ctx, cancel := context_helper.GetContext(ctx, repo.Ctx)
 	defer cancel()
 
 	query := queryapi.
@@ -314,7 +319,7 @@ func (repo *Repository[T, ID]) AddWithIdTx(tx *sqlx.Tx, entity T) error {
 	return nil
 }
 
-func (repo *Repository[T, ID]) AddList(entityList []T) error {
+func (repo *Repository[T, ID]) AddList(ctx context.Context, entityList []T) error {
 	if len(entityList) == 0 {
 		return nil
 	}
@@ -322,7 +327,7 @@ func (repo *Repository[T, ID]) AddList(entityList []T) error {
 	repo.lock()
 	defer repo.unlock()
 
-	ctx, cancel := repo.Ctx()
+	ctx, cancel := context_helper.GetContext(ctx, repo.Ctx)
 	defer cancel()
 
 	query := queryapi.
@@ -342,7 +347,7 @@ func (repo *Repository[T, ID]) AddList(entityList []T) error {
 	return nil
 }
 
-func (repo *Repository[T, ID]) AddListTx(tx *sqlx.Tx, entityList []T) error {
+func (repo *Repository[T, ID]) AddListTx(ctx context.Context, tx *sqlx.Tx, entityList []T) error {
 	if len(entityList) == 0 {
 		return nil
 	}
@@ -350,7 +355,7 @@ func (repo *Repository[T, ID]) AddListTx(tx *sqlx.Tx, entityList []T) error {
 	repo.lock()
 	defer repo.unlock()
 
-	ctx, cancel := repo.Ctx()
+	ctx, cancel := context_helper.GetContext(ctx, repo.Ctx)
 	defer cancel()
 
 	query := queryapi.
@@ -370,7 +375,7 @@ func (repo *Repository[T, ID]) AddListTx(tx *sqlx.Tx, entityList []T) error {
 	return nil
 }
 
-func (repo *Repository[T, ID]) AddListWithID(entityList []T) error {
+func (repo *Repository[T, ID]) AddListWithID(ctx context.Context, entityList []T) error {
 	if len(entityList) == 0 {
 		return nil
 	}
@@ -378,7 +383,7 @@ func (repo *Repository[T, ID]) AddListWithID(entityList []T) error {
 	repo.lock()
 	defer repo.unlock()
 
-	ctx, cancel := repo.Ctx()
+	ctx, cancel := context_helper.GetContext(ctx, repo.Ctx)
 	defer cancel()
 
 	query := queryapi.
@@ -398,7 +403,7 @@ func (repo *Repository[T, ID]) AddListWithID(entityList []T) error {
 	return nil
 }
 
-func (repo *Repository[T, ID]) AddListWithIdTx(tx *sqlx.Tx, entityList []T) error {
+func (repo *Repository[T, ID]) AddListWithIdTx(ctx context.Context, tx *sqlx.Tx, entityList []T) error {
 	if len(entityList) == 0 {
 		return nil
 	}
@@ -406,7 +411,7 @@ func (repo *Repository[T, ID]) AddListWithIdTx(tx *sqlx.Tx, entityList []T) erro
 	repo.lock()
 	defer repo.unlock()
 
-	ctx, cancel := repo.Ctx()
+	ctx, cancel := context_helper.GetContext(ctx, repo.Ctx)
 	defer cancel()
 
 	query := queryapi.
@@ -427,13 +432,14 @@ func (repo *Repository[T, ID]) AddListWithIdTx(tx *sqlx.Tx, entityList []T) erro
 }
 
 func (repo *Repository[T, ID]) Update(
+	ctx context.Context,
 	customizeFunc func(builder *update_builder.Builder),
 	entity T,
 ) error {
 	repo.lock()
 	defer repo.unlock()
 
-	ctx, cancel := repo.Ctx()
+	ctx, cancel := context_helper.GetContext(ctx, repo.Ctx)
 	defer cancel()
 
 	builder := queryapi.Update(repo.tableName)
@@ -460,6 +466,7 @@ func (repo *Repository[T, ID]) Update(
 }
 
 func (repo *Repository[T, ID]) UpdateTx(
+	ctx context.Context,
 	tx *sqlx.Tx,
 	customizeFunc func(builder *update_builder.Builder),
 	entity T,
@@ -467,7 +474,7 @@ func (repo *Repository[T, ID]) UpdateTx(
 	repo.lock()
 	defer repo.unlock()
 
-	ctx, cancel := repo.Ctx()
+	ctx, cancel := context_helper.GetContext(ctx, repo.Ctx)
 	defer cancel()
 
 	builder := queryapi.Update(repo.tableName)
@@ -493,11 +500,11 @@ func (repo *Repository[T, ID]) UpdateTx(
 	return nil
 }
 
-func (repo *Repository[T, ID]) Delete(customizeFunc func(builder *delete_builder.Builder), args ...any) error {
+func (repo *Repository[T, ID]) Delete(ctx context.Context, customizeFunc func(builder *delete_builder.Builder), args ...any) error {
 	repo.lock()
 	defer repo.unlock()
 
-	ctx, cancel := repo.Ctx()
+	ctx, cancel := context_helper.GetContext(ctx, repo.Ctx)
 	defer cancel()
 
 	builder := queryapi.Delete(repo.tableName)
@@ -515,11 +522,11 @@ func (repo *Repository[T, ID]) Delete(customizeFunc func(builder *delete_builder
 	return nil
 }
 
-func (repo *Repository[T, ID]) DeleteTx(tx *sqlx.Tx, customizeFunc func(builder *delete_builder.Builder), args ...any) error {
+func (repo *Repository[T, ID]) DeleteTx(ctx context.Context, tx *sqlx.Tx, customizeFunc func(builder *delete_builder.Builder), args ...any) error {
 	repo.lock()
 	defer repo.unlock()
 
-	ctx, cancel := repo.Ctx()
+	ctx, cancel := context_helper.GetContext(ctx, repo.Ctx)
 	defer cancel()
 
 	builder := queryapi.Delete(repo.tableName)

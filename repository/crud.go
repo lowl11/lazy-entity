@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"github.com/jmoiron/sqlx"
 	"github.com/lowl11/lazy-entity/internal/repositories"
 	"github.com/lowl11/lazy-entity/internal/repositories/crud_repository"
@@ -13,38 +14,38 @@ type ICrudRepository[T any, ID repositories.IComparableID] interface {
 	IUniversalRepository[T, ID]
 
 	// ExistByID returns true if record exist
-	ExistByID(id ID) (bool, error)
+	ExistByID(ctx context.Context, id ID) (bool, error)
 
-	CountAll() (int, error)
+	CountAll(ctx context.Context) (int, error)
 
 	// GetAll returns all records
-	GetAll() ([]T, error)
+	GetAll(ctx context.Context) ([]T, error)
 
 	// GetByID returns record by ID.
 	// If the record with such ID does not exist, returns NULL (nil)
-	GetByID(id ID) (*T, error)
+	GetByID(ctx context.Context, id ID) (*T, error)
 
 	// GetByIdList returns list of records by array of IDs.
 	// Some IDs could be not existing, there wouldn't be an error
-	GetByIdList(id []ID) ([]T, error)
+	GetByIdList(ctx context.Context, id []ID) ([]T, error)
 
 	// UpdateByID updates a record by ID
-	UpdateByID(id ID, entity T) error
+	UpdateByID(ctx context.Context, id ID, entity T) error
 
 	// UpdateByIdTx the same as UpdateByID but using transaction
-	UpdateByIdTx(tx *sqlx.Tx, id ID, entity T) error
+	UpdateByIdTx(ctx context.Context, tx *sqlx.Tx, id ID, entity T) error
 
 	// DeleteAll remove all records
-	DeleteAll() error
+	DeleteAll(ctx context.Context) error
 
 	// DeleteAllTx the same as DeleteAll but using transaction
-	DeleteAllTx(tx *sqlx.Tx) error
+	DeleteAllTx(ctx context.Context, tx *sqlx.Tx) error
 
 	// DeleteByID removes record by given ID
-	DeleteByID(id ID) error
+	DeleteByID(ctx context.Context, id ID) error
 
 	// DeleteByIdTx the same as DeleteByID but using transaction
-	DeleteByIdTx(tx *sqlx.Tx, id ID) error
+	DeleteByIdTx(ctx context.Context, tx *sqlx.Tx, id ID) error
 }
 
 func NewCrud[T any, ID repositories.IComparableID](
